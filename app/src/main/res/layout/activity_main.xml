@@ -20,16 +20,17 @@
         app:layout_constraintStart_toStartOf="parent"
         >
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             style="@style/StyleNavButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginEnd="@dimen/padding_half"
             android:backgroundTint="@color/button_tint"
             android:text="@string/categories"
             />
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             style="@style/StyleNavButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
