@@ -9,20 +9,7 @@
     tools:context=".MainActivity"
     >
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mainContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-
-    </androidx.fragment.app.FragmentContainerView>
-
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -36,8 +23,8 @@
             style="@style/StyleNavButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/padding_half"
             android:layout_weight="1"
+            android:layout_marginEnd="@dimen/padding_half"
             android:backgroundTint="@color/button_tint"
             android:text="@string/categories"
             />
