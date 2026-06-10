@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RecipeAppXML</string>
+    <string name="categories">категории</string>
+    <string name="favorites">избранное</string>
 </resources>

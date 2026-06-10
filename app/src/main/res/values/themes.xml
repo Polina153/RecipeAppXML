@@ -5,5 +5,8 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.RecipeAppXML" parent="Base.Theme.RecipeAppXML" />
+    <style name="Theme.RecipeAppXML" parent="Base.Theme.RecipeAppXML">
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+    </style>
 </resources>
