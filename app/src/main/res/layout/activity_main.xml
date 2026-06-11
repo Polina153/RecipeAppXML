@@ -33,6 +33,7 @@
         >
 
         <Button
+            android:id="@+id/categoriesButton"
             style="@style/StyleNavButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -43,6 +44,7 @@
             />
 
         <Button
+            android:id="@+id/favoritesButton"
             style="@style/StyleNavButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
