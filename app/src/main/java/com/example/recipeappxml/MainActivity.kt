@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+//default
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.mainContainer, CategoriesListFragment())
