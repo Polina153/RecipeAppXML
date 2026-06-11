@@ -1,7 +1,6 @@
 package com.example.recipeappxml
 
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -23,19 +22,19 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-//default
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .add(R.id.mainContainer, CategoriesListFragment())
                 .commit()
         }
-        binding.main.findViewById<Button>(R.id.categoriesButton).setOnClickListener {
+        binding.categoriesButton.setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.mainContainer, CategoriesListFragment())
                 .commit()
         }
 
-        binding.main.findViewById<Button>(R.id.favoritesButton).setOnClickListener {
+        binding.favoritesButton.setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.mainContainer, FavoritesFragment())
                 .commit()
