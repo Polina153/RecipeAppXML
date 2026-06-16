@@ -11,7 +11,7 @@ import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = requireNotNull(_binding)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -1,16 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:orientation="vertical"
     tools:context=".CategoriesListFragment"
     >
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/categories"
-        />
+        android:layout_height="wrap_content"
+        >
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/category_image"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_height"
+            android:contentDescription="@string/categories"
+            android:scaleType="centerCrop"
+            android:src="@drawable/categories"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+        </ImageView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_category_title"
+            android:text="@string/categories"
+            app:layout_constraintBottom_toBottomOf="@+id/category_image"
+            app:layout_constraintStart_toStartOf="@id/category_image"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_half"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="2"
+        tools:itemCount="6"
+        tools:listitem="@layout/item_category"
+        >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</LinearLayout>

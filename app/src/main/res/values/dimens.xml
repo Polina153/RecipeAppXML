@@ -3,4 +3,5 @@
     <dimen name="cornerRadius">16dp</dimen>
     <dimen name="padding_main">16dp</dimen>
     <dimen name="padding_half">8dp</dimen>
+    <dimen name="image_height">224dp</dimen>
 </resources>
