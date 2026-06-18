@@ -23,10 +23,10 @@ class CategoriesListAdapter(private val dataSet: List<Category>) :
             binding.itemDescription.text = category.description
 
             try {
-                val inputStream = itemView.context.assets.open(category.imageUrl)
-                val drawable = Drawable.createFromStream(inputStream, null)
-                binding.itemImage.setImageDrawable(drawable)
-                inputStream.close()
+                itemView.context.assets.open(category.imageUrl).use {
+                    val drawable = Drawable.createFromStream(it, null)
+                    binding.itemImage.setImageDrawable(drawable)
+                }
             } catch (e: IOException) {
                 Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
             }

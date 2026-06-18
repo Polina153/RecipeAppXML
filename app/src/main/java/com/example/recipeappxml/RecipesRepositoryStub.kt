@@ -1,8 +1,5 @@
+package com.example.recipeappxml
 
-import com.example.recipeappxml.Category
-import com.example.recipeappxml.Ingredient
-import com.example.recipeappxml.Recipe
-import java.util.Collections.emptyList
 
 class RecipesRepositoryStub {
     companion object {
