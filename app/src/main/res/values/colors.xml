@@ -4,6 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#F4FAFF</color>
     <color name="button_tint">#525DC0</color>
+    <color name="title_tint">#5F3678</color>
+    <color name="text_tint">#666666</color>
     <color name="button_red_tint">#E13E3E</color>
 
 </resources>
