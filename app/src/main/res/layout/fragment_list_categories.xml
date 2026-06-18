@@ -29,9 +29,13 @@
         </ImageView>
 
         <TextView
+            android:layout_margin="@dimen/padding_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_category_title"
+            android:textSize="24sp"
+            android:padding="@dimen/padding_half"
+            style="@style/StyleTitle14"
             android:text="@string/categories"
             app:layout_constraintBottom_toBottomOf="@+id/category_image"
             app:layout_constraintStart_toStartOf="@id/category_image"

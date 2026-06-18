@@ -2,4 +2,5 @@
     <string name="app_name">RecipeAppXML</string>
     <string name="categories">категории</string>
     <string name="favorites">избранное</string>
+    <string name="category_item_pic_content_description">Картинка элемента списка категорий</string>
 </resources>
