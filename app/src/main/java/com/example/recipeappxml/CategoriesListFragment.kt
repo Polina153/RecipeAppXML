@@ -30,14 +30,27 @@ class CategoriesListFragment : Fragment() {
         val categoriesListAdapter =
             CategoriesListAdapter(RecipesRepositoryStub.getCategories())
         categoriesListAdapter.setOnItemClickListener {
-            openRecipesByCategoryId()
+            openRecipesByCategoryId(it)
         }
         binding.rvCategories.adapter = categoriesListAdapter
     }
 
-    fun openRecipesByCategoryId() {
+    fun openRecipesByCategoryId(categoryId: Int) {
+
+        val categories = RecipesRepositoryStub.getCategories()
+        val category = categories.find { it.id == categoryId } ?: return
+
+        val categoryName: String = category.title
+        val categoryImage = category.imageUrl
+
+        val bundle = Bundle().apply {
+            putInt("ARG_CATEGORY_ID", categoryId)
+            putString("ARG_CATEGORY_NAME", categoryName)
+            putString("ARG_CATEGORY_IMAGE_URL", categoryImage)
+        }
+
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.mainContainer, RecipesListFragment())
+            .replace(R.id.mainContainer, RecipesListFragment().apply { arguments = bundle })
             .commit()
     }
 

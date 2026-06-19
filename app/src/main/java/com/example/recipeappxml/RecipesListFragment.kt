@@ -12,6 +12,9 @@ class RecipesListFragment : Fragment() {
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
 
+    var categoryId: Int? = null
+    var categoryName: String? = null
+    var categoryImage: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -19,6 +22,15 @@ class RecipesListFragment : Fragment() {
     ): View {
         _binding = FragmentRecipesListBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        arguments?.let { args ->
+            categoryId = args.getInt("ARG_CATEGORY_ID")
+            categoryName = args.getString("ARG_CATEGORY_NAME")
+            categoryImage = args.getString("ARG_CATEGORY_IMAGE_URL")
+        }
     }
 
     override fun onDestroyView() {
