@@ -44,9 +44,9 @@ class CategoriesListFragment : Fragment() {
         val categoryImage = category.imageUrl
 
         val bundle = Bundle().apply {
-            putInt("ARG_CATEGORY_ID", categoryId)
-            putString("ARG_CATEGORY_NAME", categoryName)
-            putString("ARG_CATEGORY_IMAGE_URL", categoryImage)
+            putInt(Constants.ID_KEY, categoryId)
+            putString(Constants.NAME_KEY, categoryName)
+            putString(Constants.IMAGE_KEY, categoryImage)
         }
 
         requireActivity().supportFragmentManager.beginTransaction()
