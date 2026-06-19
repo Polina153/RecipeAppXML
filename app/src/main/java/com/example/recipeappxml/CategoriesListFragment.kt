@@ -30,12 +30,12 @@ class CategoriesListFragment : Fragment() {
         val categoriesListAdapter =
             CategoriesListAdapter(RecipesRepositoryStub.getCategories())
         categoriesListAdapter.setOnItemClickListener {
-            openRecipesByCategoryId(/*categoryId*/)
+            openRecipesByCategoryId()
         }
         binding.rvCategories.adapter = categoriesListAdapter
     }
 
-    fun openRecipesByCategoryId(/*categoryId: Int*/) {
+    fun openRecipesByCategoryId() {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainContainer, RecipesListFragment())
             .commit()
