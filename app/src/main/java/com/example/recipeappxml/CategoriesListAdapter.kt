@@ -11,9 +11,11 @@ import java.io.IOException
 class CategoriesListAdapter(private val dataSet: List<Category>) :
     RecyclerView.Adapter<CategoriesListAdapter.ViewHolder>() {
 
+    private var itemClickListener: OnItemClickListener? = null
 
-    var itemClickListener: OnItemClickListener? = null
-
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        itemClickListener = listener
+    }
 
     /**
      * Provide a reference to the type of views that you are using
@@ -54,12 +56,12 @@ class CategoriesListAdapter(private val dataSet: List<Category>) :
         val category = dataSet[position]
         viewHolder.bind(category)
         viewHolder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick(categoryId = category.id)
+            itemClickListener?.onItemClick(/*categoryId = category.id*/)
         }
     }
 
-    interface OnItemClickListener {
-        fun onItemClick(categoryId: Int)
+    fun interface OnItemClickListener {
+        fun onItemClick(/*categoryId: Int*/)
     }
 
 

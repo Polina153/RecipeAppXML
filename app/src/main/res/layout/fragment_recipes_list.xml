@@ -27,13 +27,13 @@
             >
 
         </ImageView>
-
+<!--TODO настроить, чтобы заголовок не был во всю длину строки-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/padding_main"
             android:padding="@dimen/padding_half"
-            android:text="@string/categories"
+            android:text="@string/recipe_heading"
             android:background="@drawable/bg_category_title"
             style="@style/StyleTitle14"
             android:textSize="@dimen/title_size"

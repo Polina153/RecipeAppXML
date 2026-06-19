@@ -29,16 +29,13 @@ class CategoriesListFragment : Fragment() {
     fun initRecycler() {
         val categoriesListAdapter =
             CategoriesListAdapter(RecipesRepositoryStub.getCategories())
-        categoriesListAdapter.itemClickListener =
-            object : CategoriesListAdapter.OnItemClickListener {
-                override fun onItemClick(categoryId: Int) {
-                    openRecipesByCategoryId(categoryId)
-                }
-            }
+        categoriesListAdapter.setOnItemClickListener {
+            openRecipesByCategoryId(/*categoryId*/)
+        }
         binding.rvCategories.adapter = categoriesListAdapter
     }
 
-    fun openRecipesByCategoryId(categoryId: Int) {
+    fun openRecipesByCategoryId(/*categoryId: Int*/) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.mainContainer, RecipesListFragment())
             .commit()
