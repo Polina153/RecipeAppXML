@@ -56,12 +56,12 @@ class CategoriesListAdapter(private val dataSet: List<Category>) :
         val category = dataSet[position]
         viewHolder.bind(category)
         viewHolder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick()
+            itemClickListener?.onItemClick(dataSet[position].id)
         }
     }
 
     fun interface OnItemClickListener {
-        fun onItemClick()
+        fun onItemClick(categoryId: Int)
     }
 
 
