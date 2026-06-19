@@ -3,4 +3,8 @@
     <string name="categories">категории</string>
     <string name="favorites">избранное</string>
     <string name="category_item_pic_content_description">Картинка элемента списка категорий</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="recipe_heading">Бургер с грибами и сыром</string>
+    <string name="picture_of_recipe">Картинка рецепта</string>
 </resources>

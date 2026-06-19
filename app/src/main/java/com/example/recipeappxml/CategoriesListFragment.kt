@@ -27,9 +27,18 @@ class CategoriesListFragment : Fragment() {
     }
 
     fun initRecycler() {
-        val categoriesListAdapter: CategoriesListAdapter =
+        val categoriesListAdapter =
             CategoriesListAdapter(RecipesRepositoryStub.getCategories())
+        categoriesListAdapter.setOnItemClickListener {
+            openRecipesByCategoryId()
+        }
         binding.rvCategories.adapter = categoriesListAdapter
+    }
+
+    fun openRecipesByCategoryId() {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.mainContainer, RecipesListFragment())
+            .commit()
     }
 
     override fun onDestroyView() {

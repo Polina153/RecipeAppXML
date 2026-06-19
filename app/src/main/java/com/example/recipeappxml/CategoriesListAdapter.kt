@@ -11,6 +11,12 @@ import java.io.IOException
 class CategoriesListAdapter(private val dataSet: List<Category>) :
     RecyclerView.Adapter<CategoriesListAdapter.ViewHolder>() {
 
+    private var itemClickListener: OnItemClickListener? = null
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        itemClickListener = listener
+    }
+
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder)
@@ -47,8 +53,17 @@ class CategoriesListAdapter(private val dataSet: List<Category>) :
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        viewHolder.bind(dataSet[position])
+        val category = dataSet[position]
+        viewHolder.bind(category)
+        viewHolder.itemView.setOnClickListener {
+            itemClickListener?.onItemClick()
+        }
     }
+
+    fun interface OnItemClickListener {
+        fun onItemClick()
+    }
+
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = dataSet.size
