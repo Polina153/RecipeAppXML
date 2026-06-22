@@ -1,11 +1,14 @@
 package com.example.recipeappxml
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
+import java.io.IOException
 
 class RecipesListFragment : Fragment() {
 
@@ -30,6 +33,16 @@ class RecipesListFragment : Fragment() {
             categoryId = args.getInt(Constants.ID_KEY)
             categoryName = args.getString(Constants.NAME_KEY)
             categoryImage = args.getString(Constants.IMAGE_KEY)
+        }
+        binding.recipesHeadingText.text = categoryName
+
+        try {
+            binding.recipeImage.context.assets.open(categoryImage.orEmpty()).use {
+                val drawable = Drawable.createFromStream(it, null)
+                binding.recipeImage.setImageDrawable(drawable)
+            }
+        } catch (e: IOException) {
+            Log.e("RecipesHeadingImage", "Ошибка загрузки изображения", e)
         }
         initRecycler()
     }

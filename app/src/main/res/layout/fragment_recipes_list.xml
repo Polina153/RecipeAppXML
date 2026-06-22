@@ -20,7 +20,6 @@
             android:layout_height="@dimen/image_height"
             android:contentDescription="@string/picture_of_recipe"
             android:scaleType="centerCrop"
-            android:src="@drawable/burgerrecipe"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +28,7 @@
         </ImageView>
         <!--TODO настроить, чтобы заголовок не был во всю длину строки-->
         <TextView
+            android:id="@+id/recipes_heading_text"
             style="@style/StyleTitle14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,6 +45,7 @@
             android:id="@+id/rvRecipes"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
