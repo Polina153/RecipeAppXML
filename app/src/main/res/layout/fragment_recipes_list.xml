@@ -15,7 +15,7 @@
         >
 
         <ImageView
-            android:id="@+id/category_image"
+            android:id="@+id/recipe_image"
             android:layout_width="match_parent"
             android:layout_height="@dimen/image_height"
             android:contentDescription="@string/picture_of_recipe"
@@ -27,26 +27,32 @@
             >
 
         </ImageView>
-<!--TODO настроить, чтобы заголовок не был во всю длину строки-->
+        <!--TODO настроить, чтобы заголовок не был во всю длину строки-->
         <TextView
+            style="@style/StyleTitle14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/padding_main"
+            android:background="@drawable/bg_category_title"
             android:padding="@dimen/padding_half"
             android:text="@string/recipe_heading"
-            android:background="@drawable/bg_category_title"
-            style="@style/StyleTitle14"
             android:textSize="@dimen/title_size"
-            app:layout_constraintBottom_toBottomOf="@+id/category_image"
-            app:layout_constraintStart_toStartOf="@id/category_image"
+            app:layout_constraintBottom_toBottomOf="@+id/recipe_image"
+            app:layout_constraintStart_toStartOf="@id/recipe_image"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecipes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/recipe_image"
+            tools:listitem="@layout/item_recipe"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/recipe_heading"
-        />
 
 </LinearLayout>

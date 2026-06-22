@@ -31,7 +31,25 @@ class RecipesListFragment : Fragment() {
             categoryName = args.getString(Constants.NAME_KEY)
             categoryImage = args.getString(Constants.IMAGE_KEY)
         }
+        initRecycler()
     }
+
+    fun initRecycler() {
+        val recipesListAdapter = RecipesListAdapter(
+            RecipesRepositoryStub.getRecipesByCategoryId(categoryId ?: 0)
+        )
+        recipesListAdapter.setOnItemClickListener { recipeId ->
+            openRecipeByRecipeId(recipeId)
+        }
+        binding.rvRecipes.adapter = recipesListAdapter
+    }
+
+    private fun openRecipeByRecipeId(recipeId: Int) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.mainContainer, RecipeFragment())
+            .commit()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
