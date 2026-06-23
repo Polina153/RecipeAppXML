@@ -49,7 +49,7 @@ class RecipesListFragment : Fragment() {
 
     fun initRecycler() {
         val recipesListAdapter = RecipesListAdapter(
-            RecipesRepositoryStub.getRecipesByCategoryId(categoryId ?: 0)
+            RecipesRepositoryStub.getRecipesByCategoryId(/*categoryId ?:*/ 0)
         )
         recipesListAdapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
