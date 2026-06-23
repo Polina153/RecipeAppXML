@@ -47,7 +47,7 @@ class RecipesListFragment : Fragment() {
         initRecycler()
     }
 
-    fun initRecycler() {
+    private fun initRecycler() {
         val recipesListAdapter = RecipesListAdapter(
             RecipesRepositoryStub.getRecipesByCategoryId(/*categoryId ?:*/ 0)
         )
