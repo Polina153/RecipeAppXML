@@ -111,7 +111,7 @@ class RecipesRepositoryStub {
                     "4. Смазать нижние половинки булочек горчицей и кетчупом, затем положите лист салата, котлету, кольца помидора и закройте верхней половинкой булочки.",
                     "5. Подавайте бургеры горячими с картофельными чипсами или картофельным пюре."
                 ),
-                imageUrl = "burger-hamburger.png"
+                imageUrl = "burger-hamburger.jpg"
             ),
             Recipe(
                 id = 1,
@@ -155,7 +155,7 @@ class RecipesRepositoryStub {
                     "4. Соберите бургер: булочка, майонез, котлета с сыром, бекон, помидор, кетчуп.",
                     "5. Подавайте горячими."
                 ),
-                imageUrl = "burger-cheeseburger.png"
+                imageUrl = "burger-cheeseburger.jpg"
             )
         )
     }

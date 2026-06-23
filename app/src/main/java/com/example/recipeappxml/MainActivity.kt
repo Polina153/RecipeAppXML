@@ -28,16 +28,18 @@ class MainActivity : AppCompatActivity() {
                 .add(R.id.mainContainer, CategoriesListFragment())
                 .commit()
         }
-        binding.categoriesButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.mainContainer, CategoriesListFragment())
-                .commit()
-        }
+        if (::binding.isInitialized) {
+            binding.categoriesButton.setOnClickListener {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.mainContainer, CategoriesListFragment())
+                    .commit()
+            }
 
-        binding.favoritesButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.mainContainer, FavoritesFragment())
-                .commit()
+            binding.favoritesButton.setOnClickListener {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.mainContainer, FavoritesFragment())
+                    .commit()
+            }
         }
     }
 }
