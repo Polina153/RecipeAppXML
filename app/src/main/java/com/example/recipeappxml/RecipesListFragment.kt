@@ -2,11 +2,14 @@ package com.example.recipeappxml
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.recipeappxml.Constants.RECIPE_ID_KEY
+import com.example.recipeappxml.Constants.RECIPE_KEY
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import java.io.IOException
 
@@ -58,8 +61,15 @@ class RecipesListFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
+        val recipe = RecipesRepositoryStub.getRecipesByCategoryId(recipeId)
+        val bundle = Bundle()
+        bundle.putInt(RECIPE_ID_KEY, recipeId)
+        bundle.putParcelable(RECIPE_KEY, recipe as Parcelable?)
+        val fragment = RecipeFragment()
+        fragment.arguments = bundle
+
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.mainContainer, RecipeFragment())
+            .replace(R.id.mainContainer, fragment)
             .commit()
     }
 
