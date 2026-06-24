@@ -2,8 +2,9 @@ package com.example.recipeappxml
 
 import android.os.Parcel
 import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-
+@Parcelize
 data class Ingredient(
     val quantity: String,
     val unitOfMeasure: String,

@@ -14,6 +14,14 @@ class RecipesRepositoryStub {
             }
         }
 
+        fun getRecipeById(recipeId: Int): Recipe {
+            return when (recipeId) {
+                0 -> burgerRecipes[0]
+                1 -> burgerRecipes[1]
+                else -> burgerRecipes[0]
+            }
+        }
+
         private val categories = listOf(
             Category(
                 id = 0,

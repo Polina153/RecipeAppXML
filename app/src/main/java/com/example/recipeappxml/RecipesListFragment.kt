@@ -2,7 +2,6 @@ package com.example.recipeappxml
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -61,10 +60,10 @@ class RecipesListFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val recipe = RecipesRepositoryStub.getRecipesByCategoryId(recipeId)
+        val recipe = RecipesRepositoryStub.getRecipeById(recipeId)
         val bundle = Bundle()
         bundle.putInt(RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(RECIPE_KEY, recipe as Parcelable?)
+        bundle.putParcelable(RECIPE_KEY, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 
