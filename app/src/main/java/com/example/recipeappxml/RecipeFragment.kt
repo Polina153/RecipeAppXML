@@ -36,7 +36,7 @@ class RecipeFragment : Fragment() {
         // Вывод названия на экран
         recipe?.let {
             // Например, через TextView с id = tvRecipeTitle
-            view.findViewById<TextView>(R.id.some_text).text = it.title
+            binding.someText.text = it.title
         }
     }
 

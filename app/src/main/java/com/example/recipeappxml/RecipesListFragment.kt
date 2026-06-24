@@ -2,6 +2,7 @@ package com.example.recipeappxml
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -51,7 +52,7 @@ class RecipesListFragment : Fragment() {
 
     private fun initRecycler() {
         val recipesListAdapter = RecipesListAdapter(
-            RecipesRepositoryStub.getRecipesByCategoryId(/*categoryId ?:*/ 0)
+            RecipesRepositoryStub.getRecipesByCategoryId(categoryId ?: 0)
         )
         recipesListAdapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
