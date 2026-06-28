@@ -2,14 +2,13 @@ package com.example.recipeappxml
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.recipeappxml.Constants.RECIPE_ID_KEY
-import com.example.recipeappxml.Constants.RECIPE_KEY
+import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import java.io.IOException
 
@@ -64,7 +63,7 @@ class RecipesListFragment : Fragment() {
         val recipe = RecipesRepositoryStub.getRecipeById(recipeId)
         val bundle = Bundle()
         bundle.putInt(RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(RECIPE_KEY, recipe)
+        bundle.putParcelable(ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 

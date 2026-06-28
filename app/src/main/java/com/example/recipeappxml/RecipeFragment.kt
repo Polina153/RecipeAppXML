@@ -5,9 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.recipeappxml.Constants.RECIPE_KEY
+import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 
 class RecipeFragment : Fragment() {
@@ -27,10 +26,10 @@ class RecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val recipe: Recipe? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable(RECIPE_KEY, Recipe::class.java)
+            arguments?.getParcelable(ARG_RECIPE, Recipe::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getParcelable(RECIPE_KEY)
+            arguments?.getParcelable(ARG_RECIPE)
         }
 
         // Вывод названия на экран
