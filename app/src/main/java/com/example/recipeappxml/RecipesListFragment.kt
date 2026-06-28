@@ -72,7 +72,6 @@ class RecipesListFragment : Fragment() {
             .commit()
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

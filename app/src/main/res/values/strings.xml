@@ -9,4 +9,5 @@
     <string name="picture_of_recipe">Картинка рецепта</string>
     <string name="way_to_cook">Способ приготовления</string>
     <string name="ingredient">Ингредиент</string>
+    <string name="ingredients">Ингредиенты</string>
 </resources>

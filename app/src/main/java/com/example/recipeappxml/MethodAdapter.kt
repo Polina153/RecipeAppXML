@@ -3,7 +3,6 @@ package com.example.recipeappxml
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.recipeappxml.databinding.ItemIngredientBinding
 import com.example.recipeappxml.databinding.ItemMethodBinding
 
 class MethodAdapter(private val dataSet: List<String>) :
@@ -26,7 +25,7 @@ class MethodAdapter(private val dataSet: List<String>) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): MethodAdapter.ViewHolder {
+    ): ViewHolder {
         // Create new views (invoked by the layout manager)
         val binding =
             ItemMethodBinding.inflate(LayoutInflater.from(parent.context), parent, false)
