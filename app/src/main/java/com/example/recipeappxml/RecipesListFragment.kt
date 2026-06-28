@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.recipeappxml.Constants.RECIPE_ID_KEY
 import com.example.recipeappxml.Constants.ARG_RECIPE
+import com.example.recipeappxml.Constants.RECIPE_ID_KEY
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import java.io.IOException
 
@@ -31,7 +31,7 @@ class RecipesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.let { args ->
+        requireArguments().let { args ->
             categoryId = args.getInt(Constants.ID_KEY)
             categoryName = args.getString(Constants.NAME_KEY)
             categoryImage = args.getString(Constants.IMAGE_KEY)

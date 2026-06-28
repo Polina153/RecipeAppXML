@@ -26,10 +26,10 @@ class RecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val recipe: Recipe? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable(ARG_RECIPE, Recipe::class.java)
+            requireArguments().getParcelable(ARG_RECIPE, Recipe::class.java)
         } else {
             @Suppress("DEPRECATION")
-            arguments?.getParcelable(ARG_RECIPE)
+            requireArguments().getParcelable(ARG_RECIPE)
         }
 
         // Вывод названия на экран
