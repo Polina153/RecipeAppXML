@@ -7,4 +7,6 @@
 
     <string name="recipe_heading">Бургер с грибами и сыром</string>
     <string name="picture_of_recipe">Картинка рецепта</string>
+    <string name="way_to_cook">Способ приготовления</string>
+    <string name="ingredient">Ингредиент</string>
 </resources>
