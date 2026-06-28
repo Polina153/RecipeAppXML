@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.recipeappxml.Constants.ARG_RECIPE
+import com.example.recipeappxml.Constants.RECIPE_ID_KEY
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import java.io.IOException
 
@@ -29,7 +31,7 @@ class RecipesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arguments?.let { args ->
+        requireArguments().let { args ->
             categoryId = args.getInt(Constants.ID_KEY)
             categoryName = args.getString(Constants.NAME_KEY)
             categoryImage = args.getString(Constants.IMAGE_KEY)
@@ -49,7 +51,7 @@ class RecipesListFragment : Fragment() {
 
     private fun initRecycler() {
         val recipesListAdapter = RecipesListAdapter(
-            RecipesRepositoryStub.getRecipesByCategoryId(/*categoryId ?:*/ 0)
+            RecipesRepositoryStub.getRecipesByCategoryId(categoryId ?: 0)
         )
         recipesListAdapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
@@ -58,8 +60,15 @@ class RecipesListFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
+        val recipe = RecipesRepositoryStub.getRecipeById(recipeId)
+        val bundle = Bundle()
+        bundle.putInt(RECIPE_ID_KEY, recipeId)
+        bundle.putParcelable(ARG_RECIPE, recipe)
+        val fragment = RecipeFragment()
+        fragment.arguments = bundle
+
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.mainContainer, RecipeFragment())
+            .replace(R.id.mainContainer, fragment)
             .commit()
     }
 

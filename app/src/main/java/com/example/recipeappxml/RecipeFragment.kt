@@ -1,10 +1,12 @@
 package com.example.recipeappxml
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 
 class RecipeFragment : Fragment() {
@@ -18,6 +20,23 @@ class RecipeFragment : Fragment() {
     ): View {
         _binding = FragmentRecipeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val recipe: Recipe? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requireArguments().getParcelable(ARG_RECIPE, Recipe::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            requireArguments().getParcelable(ARG_RECIPE)
+        }
+
+        // Вывод названия на экран
+        recipe?.let {
+            // Например, через TextView с id = tvRecipeTitle
+            binding.someText.text = it.title
+        }
     }
 
     override fun onDestroyView() {

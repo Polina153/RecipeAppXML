@@ -53,6 +53,7 @@
             android:text="@string/favorites"
             app:icon="@drawable/ic_heart_empty"
             app:iconGravity="end"
+            android:theme="@style/ThemeOverlay.AppCompat.Light"
 
             />
 
