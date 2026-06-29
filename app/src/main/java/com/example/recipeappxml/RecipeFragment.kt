@@ -78,6 +78,7 @@ class RecipeFragment : Fragment() {
                 fromUser: Boolean
             ) {
                 ingredientsAdapter?.updateIngredients(progress)
+                binding.amount.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {

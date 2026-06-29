@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeappxml.databinding.ItemIngredientBinding
+import java.util.Locale
 
 
 class IngredientsAdapter(private val dataSet: List<Ingredient>) :
@@ -21,13 +22,19 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(ingredient: Ingredient, multiplier: Int) {
-            val rawValue = ingredient.quantity.toDouble() * multiplier
-            val formatted = if (rawValue == rawValue.toLong().toDouble()) {
-                rawValue.toLong().toString()
+            val quantityValue = ingredient.quantity.toDoubleOrNull()
+            val formatted = if (quantityValue != null) {
+                val rawValue = quantityValue * multiplier
+                if (rawValue == rawValue.toLong().toDouble()) {
+                    rawValue.toLong().toString()
+                } else {
+                    String.format(Locale.US, "%.1f", rawValue)
+                }
             } else {
-                String.format("%.1f", rawValue)
+                ingredient.quantity
             }
-            binding.ingredient.text = "$formatted ${ingredient.unitOfMeasure} ${ingredient.description}"
+            binding.ingredient.text =
+                "$formatted ${ingredient.unitOfMeasure} ${ingredient.description}"
 
         }
     }
