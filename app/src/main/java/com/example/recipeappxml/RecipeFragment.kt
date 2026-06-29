@@ -1,13 +1,18 @@
 package com.example.recipeappxml
 
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
+import com.google.android.material.divider.MaterialDividerItemDecoration
+import java.io.IOException
 
 class RecipeFragment : Fragment() {
 
@@ -31,12 +36,40 @@ class RecipeFragment : Fragment() {
             @Suppress("DEPRECATION")
             requireArguments().getParcelable(ARG_RECIPE)
         }
+        initUI(recipe)
+        initRecycler(recipe)
 
-        // Вывод названия на экран
-        recipe?.let {
-            // Например, через TextView с id = tvRecipeTitle
-            binding.someText.text = it.title
+    }
+
+    fun initUI(recipe: Recipe?) {
+
+        binding.recipeName.text = recipe?.title
+
+        try {
+            recipe?.imageUrl?.let { requireContext().assets.open(it) }.use {
+                val drawable = Drawable.createFromStream(it, null)
+                binding.recipeImage.setImageDrawable(drawable)
+            }
+        } catch (e: IOException) {
+            Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
         }
+    }
+
+    fun initRecycler(recipe: Recipe?) {
+        val ingredientsAdapter =
+            recipe?.ingredients?.let { IngredientsAdapter(it) }
+        binding.rvIngredients.adapter = ingredientsAdapter
+
+        val methodAdapter =
+            recipe?.method?.let { MethodAdapter(it) }
+        binding.rvMethod.adapter = methodAdapter
+
+        val divider = MaterialDividerItemDecoration(
+            requireContext(),
+            LinearLayoutManager.VERTICAL
+        )
+        binding.rvIngredients.addItemDecoration(divider)
+        binding.rvMethod.addItemDecoration(divider)
     }
 
     override fun onDestroyView() {
