@@ -10,4 +10,6 @@
     <string name="way_to_cook">Способ приготовления</string>
     <string name="ingredient">Ингредиент</string>
     <string name="ingredients">Ингредиенты</string>
+    <string name="portions">Порции</string>
+    <string name="_1">1</string>
 </resources>
