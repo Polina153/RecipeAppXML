@@ -46,23 +46,73 @@
             style="@style/StyleTitle14"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_category_title"
             android:text="@string/ingredients"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recipe_image"
             />
+
+        <LinearLayout
+            android:id="@+id/subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_half"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/rvIngredients"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ingredients"
+            >
+
+            <TextView
+                android:id="@+id/items"
+                style="@style/StyleText12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_category_title"
+                android:fontFamily="@font"
+                android:text="@string/portions"
+                android:textSize="16sp"
+                />
+
+            <TextView
+                android:id="@+id/amount"
+                style="@style/StyleText12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_category_title"
+                android:fontFamily="@font"
+                android:text="@string/portions"
+                android:textSize="16sp"
+                />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:min="1"
+            android:max="5"
+            app:layout_constraintBottom_toTopOf="@id/rvIngredients"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            />
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvIngredients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_half"
             android:background="@color/white"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:textSize="24sp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ingredients"
+            app:layout_constraintTop_toBottomOf="@id/seekBar"
             >
 
         </androidx.recyclerview.widget.RecyclerView>
@@ -81,12 +131,12 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvMethod"
-            android:background="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_half"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:background="@color/white"
             android:textSize="24sp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/wayToCook"
