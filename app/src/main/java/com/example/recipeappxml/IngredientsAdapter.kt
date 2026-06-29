@@ -22,13 +22,13 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(ingredient: Ingredient, multiplier: Int) {
-            val quantityValue = ingredient.quantity.toDoubleOrNull()
+            val quantityValue = ingredient.quantity.toBigDecimalOrNull()
             val formatted = if (quantityValue != null) {
-                val rawValue = quantityValue * multiplier
-                if (rawValue == rawValue.toLong().toDouble()) {
+                val rawValue = quantityValue * multiplier.toBigDecimal()
+                if (rawValue.stripTrailingZeros().scale() <= 0) {
                     rawValue.toLong().toString()
                 } else {
-                    String.format(Locale.US, "%.1f", rawValue)
+                    String.format(Locale.US, "%.1f", rawValue.toDouble())
                 }
             } else {
                 ingredient.quantity
