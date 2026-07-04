@@ -27,6 +27,18 @@
 
         </ImageView>
 
+        <ImageButton
+            android:id="@+id/icon_heart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_main"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/icon_favorite"
+            app:layout_constraintEnd_toEndOf="@id/recipe_image"
+            app:layout_constraintTop_toTopOf="@id/recipe_image"
+            tools:src="@drawable/ic_heart"
+            />
+
         <TextView
             android:id="@+id/recipe_name"
             style="@style/StyleTitle14"
@@ -92,8 +104,8 @@
             style="@style/StyleSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:min="1"
             android:max="5"
+            android:min="1"
             app:layout_constraintBottom_toTopOf="@id/rvIngredients"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
