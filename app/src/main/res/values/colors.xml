@@ -7,5 +7,7 @@
     <color name="title_tint">#5F3678</color>
     <color name="text_tint">#666666</color>
     <color name="button_red_tint">#E13E3E</color>
+    <color name="seekbar_thumb">#525DC0</color>
+    <color name="seekbar_progress">#A1A9F9</color>
 
 </resources>
