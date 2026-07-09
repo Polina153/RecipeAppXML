@@ -8,4 +8,7 @@ object Constants {
 
     const val ARG_RECIPE = "ARG_RECIPE"
     const val RECIPE_ID_KEY = "ARG_RECIPE_ID"
+
+    const val FAVORITES_PREFS_NAME = "favorites_prefs"
+    const val FAVORITES_KEY = "favorites_set"
 }

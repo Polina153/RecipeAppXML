@@ -1,5 +1,6 @@
 package com.example.recipeappxml
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +15,9 @@ import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import java.io.IOException
+import androidx.core.content.edit
+import com.example.recipeappxml.Constants.FAVORITES_KEY
+import com.example.recipeappxml.Constants.FAVORITES_PREFS_NAME
 
 class RecipeFragment : Fragment() {
 
@@ -40,7 +44,37 @@ class RecipeFragment : Fragment() {
         initUI(recipe)
         initRecycler(recipe)
 
+        val recipeId = recipe?.id?.toString() ?: return
+
+        val favorites = getFavorites()
+        val isFavorite = favorites.contains(recipeId)
+        updateFavoriteIcon(isFavorite)
+
+        // 2. Вешаем клик на сердечко
+        binding.favoriteButton.setOnClickListener {
+            val currentFavorites = getFavorites()
+            val updatedSet: Set<String>
+            val newState: Boolean
+
+            if (currentFavorites.contains(recipeId)) {
+                // Удаляем из избранного
+                updatedSet = currentFavorites - recipeId
+                newState = false
+            } else {
+                // Добавляем в избранное
+                updatedSet = currentFavorites + recipeId
+                newState = true
+            }
+            saveFavorites(updatedSet)
+            updateFavoriteIcon(newState)
+        }
     }
+
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        val iconRes = if (isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+        binding.favoriteButton.setImageResource(iconRes)
+    }
+
 
     fun initUI(recipe: Recipe?) {
 
@@ -90,6 +124,22 @@ class RecipeFragment : Fragment() {
             }
 
         })
+    }
+
+    fun saveFavorites(idCollection: Set<String>) {
+        val sharedPref =
+            requireActivity().getSharedPreferences(FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+        sharedPref.edit {
+            putStringSet(FAVORITES_KEY, idCollection)
+            apply()
+        }
+    }
+
+    fun getFavorites(): MutableSet<String> {
+        val sharedPref =
+            requireActivity().getSharedPreferences(FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+        val storedSet = sharedPref.getStringSet(FAVORITES_KEY, emptySet()) ?: emptySet()
+        return HashSet(storedSet)
     }
 
     override fun onDestroyView() {
