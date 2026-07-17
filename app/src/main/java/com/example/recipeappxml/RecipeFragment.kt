@@ -78,6 +78,7 @@ class RecipeFragment : Fragment() {
 
     fun initUI(recipe: Recipe?) {
 
+        binding.iconHeart
         binding.recipeName.text = recipe?.title
 
         try {
@@ -87,6 +88,22 @@ class RecipeFragment : Fragment() {
             }
         } catch (e: IOException) {
             Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
+        }
+
+        // 2. Слушатель кликов с переключением иконки
+        var isFavorite = false
+        // 1. Исходное изображение сердца (пустое, не закрашенное)
+        binding.iconHeart.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
+
+
+        binding.iconHeart.setOnClickListener {
+            isFavorite = !isFavorite
+            val iconRes = if (isFavorite) {
+                R.drawable.ic_heart    // закрашенное сердце
+            } else {
+                R.drawable.ic_heart_empty           // пустое сердце
+            }
+            binding.iconHeart.setImageResource(iconRes)
         }
     }
 
