@@ -1,4 +1,4 @@
-package com.example.recipeappxml
+package com.example.recipeappxml.data
 
 object Constants {
 

@@ -1,5 +1,8 @@
-package com.example.recipeappxml
+package com.example.recipeappxml.data
 
+import com.example.recipeappxml.model.Category
+import com.example.recipeappxml.model.Ingredient
+import com.example.recipeappxml.model.Recipe
 
 class RecipesRepositoryStub {
     companion object {

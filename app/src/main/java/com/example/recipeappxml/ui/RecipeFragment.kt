@@ -1,4 +1,4 @@
-package com.example.recipeappxml
+package com.example.recipeappxml.ui
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -11,13 +11,15 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.recipeappxml.Constants.ARG_RECIPE
+import com.example.recipeappxml.data.Constants.ARG_RECIPE
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import java.io.IOException
 import androidx.core.content.edit
-import com.example.recipeappxml.Constants.FAVORITES_KEY
-import com.example.recipeappxml.Constants.FAVORITES_PREFS_NAME
+import com.example.recipeappxml.R
+import com.example.recipeappxml.data.Constants.FAVORITES_KEY
+import com.example.recipeappxml.data.Constants.FAVORITES_PREFS_NAME
+import com.example.recipeappxml.model.Recipe
 
 class RecipeFragment : Fragment() {
 

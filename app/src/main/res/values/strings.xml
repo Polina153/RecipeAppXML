@@ -16,4 +16,5 @@
     <string name="add_to_favorites">Кнопка добавления в избранное</string>
     <string name="description_picture_favorites">Картинка для экрана с избранными рецептами</string>
     <string name="favorites_stub">У вас пока нет избранных рецептов</string>
+    <string name="icon_favorite">иконка избранного</string>
 </resources>

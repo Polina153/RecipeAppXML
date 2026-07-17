@@ -1,4 +1,4 @@
-package com.example.recipeappxml
+package com.example.recipeappxml.ui
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -7,8 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.recipeappxml.Constants.ARG_RECIPE
-import com.example.recipeappxml.Constants.RECIPE_ID_KEY
+import com.example.recipeappxml.R
+import com.example.recipeappxml.data.Constants
+import com.example.recipeappxml.data.Constants.ARG_RECIPE
+import com.example.recipeappxml.data.Constants.RECIPE_ID_KEY
+import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import java.io.IOException
 
