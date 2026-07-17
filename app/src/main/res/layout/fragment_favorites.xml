@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -36,6 +36,17 @@
         app:layout_constraintBottom_toBottomOf="@+id/recipe_image"
         app:layout_constraintStart_toStartOf="@id/recipe_image"
         />
+
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/favorites_stub"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipe_image" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecipes"

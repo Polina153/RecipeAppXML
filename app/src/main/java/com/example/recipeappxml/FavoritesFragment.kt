@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.example.recipeappxml.Constants.ARG_RECIPE
 import com.example.recipeappxml.Constants.FAVORITES_KEY
 import com.example.recipeappxml.Constants.FAVORITES_PREFS_NAME
@@ -28,8 +29,6 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         initRecycler()
     }
 
@@ -39,13 +38,16 @@ class FavoritesFragment : Fragment() {
               RecipesRepositoryStub.getRecipeById(id.toIntOrNull() ?: return@mapNotNull null)
           }*/
         val ids = favoriteIds.mapNotNull { it.toIntOrNull() }.toSet() // Set<Int>
-        val favoriteRecipes = RecipesRepositoryStub.getRecipeByIds(ids)
+        val favoriteRecipes = RecipesRepositoryStub.getRecipesByIds(ids)
 
         val recipesListAdapter = RecipesListAdapter(favoriteRecipes)
         recipesListAdapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
         }
         binding.rvRecipes.adapter = recipesListAdapter
+        val isEmpty = favoriteRecipes.isEmpty()
+        binding.rvRecipes.isVisible = !isEmpty        // скрываем RecyclerView
+        binding.tvEmptyState.isVisible = isEmpty
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
