@@ -22,6 +22,10 @@ class RecipesRepositoryStub {
             }
         }
 
+        fun getRecipeByIds(ids: Set<Int>): List<Recipe> {
+            return burgerRecipes.filter { ids.contains(it.id) }
+        }
+
         private val categories = listOf(
             Category(
                 id = 0,
