@@ -1,16 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:orientation="vertical"
     tools:context=".FavoritesFragment"
     >
 
-    <TextView
+    <ImageView
+        android:id="@+id/recipe_image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/image_height"
+        android:contentDescription="@string/description_picture_favorites"
+        android:scaleType="centerCrop"
+        android:src="@drawable/favorites"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+    </ImageView>
+    <!--TODO настроить, чтобы заголовок не был во всю длину строки-->
+    <TextView
+        android:id="@+id/favorites_heading_text"
+        style="@style/StyleTitle14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_main"
+        android:background="@drawable/bg_category_title"
+        android:padding="@dimen/padding_half"
         android:text="@string/favorites"
+        android:textSize="@dimen/title_size"
+        app:layout_constraintBottom_toBottomOf="@+id/recipe_image"
+        app:layout_constraintStart_toStartOf="@id/recipe_image"
         />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/favorites_stub"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipe_image" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRecipes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipe_image"
+        tools:listitem="@layout/item_recipe"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
