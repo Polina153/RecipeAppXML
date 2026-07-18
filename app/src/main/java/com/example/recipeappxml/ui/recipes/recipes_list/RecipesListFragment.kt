@@ -1,4 +1,4 @@
-package com.example.recipeappxml.ui
+package com.example.recipeappxml.ui.recipes.recipes_list
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -9,10 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
-import com.example.recipeappxml.data.Constants.ARG_RECIPE
-import com.example.recipeappxml.data.Constants.RECIPE_ID_KEY
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
+import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
 import java.io.IOException
 
 class RecipesListFragment : Fragment() {
@@ -54,7 +53,7 @@ class RecipesListFragment : Fragment() {
 
     private fun initRecycler() {
         val recipesListAdapter = RecipesListAdapter(
-            RecipesRepositoryStub.getRecipesByCategoryId(categoryId ?: 0)
+            RecipesRepositoryStub.Companion.getRecipesByCategoryId(categoryId ?: 0)
         )
         recipesListAdapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
@@ -63,10 +62,10 @@ class RecipesListFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val recipe = RecipesRepositoryStub.getRecipeById(recipeId)
+        val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
         val bundle = Bundle()
-        bundle.putInt(RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(ARG_RECIPE, recipe)
+        bundle.putInt(Constants.RECIPE_ID_KEY, recipeId)
+        bundle.putParcelable(Constants.ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 

@@ -1,4 +1,4 @@
-package com.example.recipeappxml.ui
+package com.example.recipeappxml.ui.categories
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
-
+import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListFragment
 
 class CategoriesListFragment : Fragment() {
 
@@ -31,7 +31,7 @@ class CategoriesListFragment : Fragment() {
 
     fun initRecycler() {
         val categoriesListAdapter =
-            CategoriesListAdapter(RecipesRepositoryStub.getCategories())
+            CategoriesListAdapter(RecipesRepositoryStub.Companion.getCategories())
         categoriesListAdapter.setOnItemClickListener {
             openRecipesByCategoryId(it)
         }
@@ -40,7 +40,7 @@ class CategoriesListFragment : Fragment() {
 
     fun openRecipesByCategoryId(categoryId: Int) {
 
-        val categories = RecipesRepositoryStub.getCategories()
+        val categories = RecipesRepositoryStub.Companion.getCategories()
         val category = categories.find { it.id == categoryId } ?: return
 
         val categoryName: String = category.title

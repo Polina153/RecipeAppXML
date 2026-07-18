@@ -1,4 +1,4 @@
-package com.example.recipeappxml.ui
+package com.example.recipeappxml.ui.recipes.recipe
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -9,17 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.recipeappxml.data.Constants.ARG_RECIPE
+import com.example.recipeappxml.R
+import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
+import com.example.recipeappxml.model.Recipe
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import java.io.IOException
-import androidx.core.content.edit
-import com.example.recipeappxml.R
-import com.example.recipeappxml.data.Constants.FAVORITES_KEY
-import com.example.recipeappxml.data.Constants.FAVORITES_PREFS_NAME
-import com.example.recipeappxml.model.Recipe
 
 class RecipeFragment : Fragment() {
 
@@ -38,10 +36,10 @@ class RecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val recipe: Recipe? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable(ARG_RECIPE, Recipe::class.java)
+            requireArguments().getParcelable(Constants.ARG_RECIPE, Recipe::class.java)
         } else {
             @Suppress("DEPRECATION")
-            requireArguments().getParcelable(ARG_RECIPE)
+            requireArguments().getParcelable(Constants.ARG_RECIPE)
         }
         initUI(recipe)
         initRecycler(recipe)
@@ -80,7 +78,6 @@ class RecipeFragment : Fragment() {
 
     fun initUI(recipe: Recipe?) {
 
-        binding.iconHeart
         binding.recipeName.text = recipe?.title
 
         try {
@@ -95,17 +92,17 @@ class RecipeFragment : Fragment() {
         // 2. Слушатель кликов с переключением иконки
         var isFavorite = false
         // 1. Исходное изображение сердца (пустое, не закрашенное)
-        binding.iconHeart.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
+        binding.favoriteButton.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
 
 
-        binding.iconHeart.setOnClickListener {
+        binding.favoriteButton.setOnClickListener {
             isFavorite = !isFavorite
             val iconRes = if (isFavorite) {
                 R.drawable.ic_heart    // закрашенное сердце
             } else {
                 R.drawable.ic_heart_empty           // пустое сердце
             }
-            binding.iconHeart.setImageResource(iconRes)
+            binding.favoriteButton.setImageResource(iconRes)
         }
     }
 
@@ -147,17 +144,23 @@ class RecipeFragment : Fragment() {
 
     fun saveFavorites(idCollection: Set<String>) {
         val sharedPref =
-            requireActivity().getSharedPreferences(FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+            requireActivity().getSharedPreferences(
+                Constants.FAVORITES_PREFS_NAME,
+                Context.MODE_PRIVATE
+            )
         sharedPref.edit {
-            putStringSet(FAVORITES_KEY, idCollection)
+            putStringSet(Constants.FAVORITES_KEY, idCollection)
             apply()
         }
     }
 
     fun getFavorites(): MutableSet<String> {
         val sharedPref =
-            requireActivity().getSharedPreferences(FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
-        val storedSet = sharedPref.getStringSet(FAVORITES_KEY, emptySet()) ?: emptySet()
+            requireActivity().getSharedPreferences(
+                Constants.FAVORITES_PREFS_NAME,
+                Context.MODE_PRIVATE
+            )
+        val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
         return HashSet(storedSet)
     }
 

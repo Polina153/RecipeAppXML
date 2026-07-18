@@ -1,20 +1,18 @@
-package com.example.recipeappxml.ui
+package com.example.recipeappxml.ui.recipes.favorites
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import com.example.recipeappxml.R
-import com.example.recipeappxml.data.Constants.ARG_RECIPE
-import com.example.recipeappxml.data.Constants.FAVORITES_KEY
-import com.example.recipeappxml.data.Constants.FAVORITES_PREFS_NAME
-import com.example.recipeappxml.data.Constants.RECIPE_ID_KEY
+import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
-
+import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
+import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
 
 class FavoritesFragment : Fragment() {
 
@@ -40,7 +38,7 @@ class FavoritesFragment : Fragment() {
               RecipesRepositoryStub.getRecipeById(id.toIntOrNull() ?: return@mapNotNull null)
           }*/
         val ids = favoriteIds.mapNotNull { it.toIntOrNull() }.toSet() // Set<Int>
-        val favoriteRecipes = RecipesRepositoryStub.getRecipesByIds(ids)
+        val favoriteRecipes = RecipesRepositoryStub.Companion.getRecipesByIds(ids)
 
         val recipesListAdapter = RecipesListAdapter(favoriteRecipes)
         recipesListAdapter.setOnItemClickListener { recipeId ->
@@ -53,10 +51,10 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val recipe = RecipesRepositoryStub.getRecipeById(recipeId)
+        val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
         val bundle = Bundle()
-        bundle.putInt(RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(ARG_RECIPE, recipe)
+        bundle.putInt(Constants.RECIPE_ID_KEY, recipeId)
+        bundle.putParcelable(Constants.ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 
@@ -67,8 +65,8 @@ class FavoritesFragment : Fragment() {
 
     private fun getFavorites(): MutableSet<String> {
         val sharedPref =
-            requireActivity().getSharedPreferences(FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
-        val storedSet = sharedPref.getStringSet(FAVORITES_KEY, emptySet()) ?: emptySet()
+            requireActivity().getSharedPreferences(Constants.FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+        val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
         return HashSet(storedSet)
     }
 

@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.recipeappxml.databinding.ActivityMainBinding
-import com.example.recipeappxml.ui.CategoriesListFragment
-import com.example.recipeappxml.ui.FavoritesFragment
+import com.example.recipeappxml.ui.categories.CategoriesListFragment
+import com.example.recipeappxml.ui.recipes.favorites.FavoritesFragment
 
 class MainActivity : AppCompatActivity() {
 
