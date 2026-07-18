@@ -36,18 +36,7 @@
             app:layout_constraintEnd_toEndOf="@id/recipe_image"
             app:layout_constraintTop_toTopOf="@id/recipe_image"
             />
-
-        <ImageButton
-            android:id="@+id/icon_heart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/padding_main"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/icon_favorite"
-            app:layout_constraintEnd_toEndOf="@id/recipe_image"
-            app:layout_constraintTop_toTopOf="@id/recipe_image"
-            tools:src="@drawable/ic_heart"
-            />
+        <!--android:background="?attr/selectableItemBackgroundBorderless"-->
 
         <TextView
             android:id="@+id/recipe_name"

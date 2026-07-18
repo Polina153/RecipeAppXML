@@ -78,7 +78,6 @@ class RecipeFragment : Fragment() {
 
     fun initUI(recipe: Recipe?) {
 
-        binding.iconHeart
         binding.recipeName.text = recipe?.title
 
         try {
@@ -93,17 +92,17 @@ class RecipeFragment : Fragment() {
         // 2. Слушатель кликов с переключением иконки
         var isFavorite = false
         // 1. Исходное изображение сердца (пустое, не закрашенное)
-        binding.iconHeart.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
+        binding.favoriteButton.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
 
 
-        binding.iconHeart.setOnClickListener {
+        binding.favoriteButton.setOnClickListener {
             isFavorite = !isFavorite
             val iconRes = if (isFavorite) {
                 R.drawable.ic_heart    // закрашенное сердце
             } else {
                 R.drawable.ic_heart_empty           // пустое сердце
             }
-            binding.iconHeart.setImageResource(iconRes)
+            binding.favoriteButton.setImageResource(iconRes)
         }
     }
 
@@ -145,7 +144,10 @@ class RecipeFragment : Fragment() {
 
     fun saveFavorites(idCollection: Set<String>) {
         val sharedPref =
-            requireActivity().getSharedPreferences(Constants.FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+            requireActivity().getSharedPreferences(
+                Constants.FAVORITES_PREFS_NAME,
+                Context.MODE_PRIVATE
+            )
         sharedPref.edit {
             putStringSet(Constants.FAVORITES_KEY, idCollection)
             apply()
@@ -154,7 +156,10 @@ class RecipeFragment : Fragment() {
 
     fun getFavorites(): MutableSet<String> {
         val sharedPref =
-            requireActivity().getSharedPreferences(Constants.FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
+            requireActivity().getSharedPreferences(
+                Constants.FAVORITES_PREFS_NAME,
+                Context.MODE_PRIVATE
+            )
         val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
         return HashSet(storedSet)
     }
