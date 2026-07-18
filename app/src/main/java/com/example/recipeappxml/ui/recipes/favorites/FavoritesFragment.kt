@@ -12,7 +12,7 @@ import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
-import com.example.recipeappxml.ui.recipes.recipeslist.RecipesListAdapter
+import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
 
 class FavoritesFragment : Fragment() {
 

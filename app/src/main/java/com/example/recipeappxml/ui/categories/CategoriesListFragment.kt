@@ -9,7 +9,7 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
-import com.example.recipeappxml.ui.recipes.recipeslist.RecipesListFragment
+import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListFragment
 
 class CategoriesListFragment : Fragment() {
 

@@ -28,7 +28,7 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
                 if (rawValue.stripTrailingZeros().scale() <= 0) {
                     rawValue.toLong().toString()
                 } else {
-                    String.Companion.format(Locale.US, "%.1f", rawValue.toDouble())
+                    String.format(Locale.US, "%.1f", rawValue.toDouble())
                 }
             } else {
                 ingredient.quantity
