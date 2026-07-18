@@ -1,4 +1,4 @@
-package com.example.recipeappxml.ui
+package com.example.recipeappxml.ui.recipes.recipe
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeappxml.databinding.ItemIngredientBinding
 import com.example.recipeappxml.model.Ingredient
 import java.util.Locale
-
 
 class IngredientsAdapter(private val dataSet: List<Ingredient>) :
     RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
@@ -29,7 +28,7 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
                 if (rawValue.stripTrailingZeros().scale() <= 0) {
                     rawValue.toLong().toString()
                 } else {
-                    String.format(Locale.US, "%.1f", rawValue.toDouble())
+                    String.Companion.format(Locale.US, "%.1f", rawValue.toDouble())
                 }
             } else {
                 ingredient.quantity
