@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
@@ -23,6 +25,8 @@ class RecipeFragment : Fragment() {
 
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = requireNotNull(_binding)
+
+    private val viewModel: RecipeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,30 +48,11 @@ class RecipeFragment : Fragment() {
         initUI(recipe)
         initRecycler(recipe)
 
-        val recipeId = recipe?.id?.toString() ?: return
+        viewModel.selectedRecipe.observe(viewLifecycleOwner, Observer{
+            Log.i("!!!", it.isFavorite.toString())
+        })
 
-        val favorites = getFavorites()
-        val isFavorite = favorites.contains(recipeId)
-        updateFavoriteIcon(isFavorite)
 
-        // 2. Вешаем клик на сердечко
-        binding.favoriteButton.setOnClickListener {
-            val currentFavorites = getFavorites()
-            val updatedSet: Set<String>
-            val newState: Boolean
-
-            if (currentFavorites.contains(recipeId)) {
-                // Удаляем из избранного
-                updatedSet = currentFavorites - recipeId
-                newState = false
-            } else {
-                // Добавляем в избранное
-                updatedSet = currentFavorites + recipeId
-                newState = true
-            }
-            saveFavorites(updatedSet)
-            updateFavoriteIcon(newState)
-        }
     }
 
     private fun updateFavoriteIcon(isFavorite: Boolean) {
@@ -89,20 +74,28 @@ class RecipeFragment : Fragment() {
             Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
         }
 
-        // 2. Слушатель кликов с переключением иконки
-        var isFavorite = false
-        // 1. Исходное изображение сердца (пустое, не закрашенное)
-        binding.favoriteButton.setImageResource(R.drawable.ic_heart_empty)  // или ic_heart_border, если есть отдельный файл
+        val recipeId = recipe?.id?.toString() ?: return
+        val favorites = getFavorites()
+        val isFavorite = favorites.contains(recipeId)
+        updateFavoriteIcon(isFavorite)
 
-
+        // 2. Вешаем клик на сердечко
         binding.favoriteButton.setOnClickListener {
-            isFavorite = !isFavorite
-            val iconRes = if (isFavorite) {
-                R.drawable.ic_heart    // закрашенное сердце
+            val currentFavorites = getFavorites()
+            val updatedSet: Set<String>
+            val newState: Boolean
+
+            if (currentFavorites.contains(recipeId)) {
+                // Удаляем из избранного
+                updatedSet = currentFavorites - recipeId
+                newState = false
             } else {
-                R.drawable.ic_heart_empty           // пустое сердце
+                // Добавляем в избранное
+                updatedSet = currentFavorites + recipeId
+                newState = true
             }
-            binding.favoriteButton.setImageResource(iconRes)
+            saveFavorites(updatedSet)
+            updateFavoriteIcon(newState)
         }
     }
 
