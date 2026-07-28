@@ -62,10 +62,10 @@ class RecipesListFragment : Fragment() {
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
+        //val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
         val bundle = Bundle()
         bundle.putInt(Constants.RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(Constants.ARG_RECIPE, recipe)
+        //bundle.putParcelable(Constants.ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 

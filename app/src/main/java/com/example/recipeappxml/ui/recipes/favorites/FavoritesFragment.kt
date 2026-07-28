@@ -50,11 +50,17 @@ class FavoritesFragment : Fragment() {
         binding.tvEmptyState.isVisible = isEmpty
     }
 
+    private fun getFavorites(): Set<String> {
+        val sharedPref = requireActivity().getSharedPreferences(
+            Constants.FAVORITES_PREFS_NAME,
+            Context.MODE_PRIVATE
+        )
+        return sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
+    }
+
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
         val bundle = Bundle()
         bundle.putInt(Constants.RECIPE_ID_KEY, recipeId)
-        bundle.putParcelable(Constants.ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 
@@ -63,12 +69,6 @@ class FavoritesFragment : Fragment() {
             .commit()
     }
 
-    private fun getFavorites(): MutableSet<String> {
-        val sharedPref =
-            requireActivity().getSharedPreferences(Constants.FAVORITES_PREFS_NAME, Context.MODE_PRIVATE)
-        val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
-        return HashSet(storedSet)
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

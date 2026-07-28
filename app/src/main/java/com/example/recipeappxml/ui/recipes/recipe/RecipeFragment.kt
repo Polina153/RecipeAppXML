@@ -1,23 +1,18 @@
 package com.example.recipeappxml.ui.recipes.recipe
 
-import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
-import com.example.recipeappxml.model.Recipe
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import java.io.IOException
 
@@ -38,20 +33,10 @@ class RecipeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val recipe: Recipe? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable(Constants.ARG_RECIPE, Recipe::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            requireArguments().getParcelable(Constants.ARG_RECIPE)
-        }
-        initUI(recipe)
-        initRecycler(recipe)
-
-        viewModel.selectedRecipe.observe(viewLifecycleOwner, Observer{
-            Log.i("!!!", it.isFavorite.toString())
-        })
-
+        val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
+        viewModel.loadRecipe(recipeId)
+        initUI()
+        initRecycler()
 
     }
 
@@ -61,52 +46,35 @@ class RecipeFragment : Fragment() {
     }
 
 
-    fun initUI(recipe: Recipe?) {
+    fun initUI() {
+        viewModel.selectedRecipe.observe(viewLifecycleOwner) {
+            Log.i("!!!", it.isFavorite.toString())
 
-        binding.recipeName.text = recipe?.title
+            binding.recipeName.text = it.title
 
-        try {
-            recipe?.imageUrl?.let { requireContext().assets.open(it) }.use {
-                val drawable = Drawable.createFromStream(it, null)
-                binding.recipeImage.setImageDrawable(drawable)
+            try {
+                it.imageUrl?.let { requireContext().assets.open(it) }.use {
+                    val drawable = Drawable.createFromStream(it, null)
+                    binding.recipeImage.setImageDrawable(drawable)
+                }
+            } catch (e: IOException) {
+                Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
             }
-        } catch (e: IOException) {
-            Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
-        }
 
-        val recipeId = recipe?.id?.toString() ?: return
-        val favorites = getFavorites()
-        val isFavorite = favorites.contains(recipeId)
-        updateFavoriteIcon(isFavorite)
+            updateFavoriteIcon(it.isFavorite)
+        }
 
         // 2. Вешаем клик на сердечко
         binding.favoriteButton.setOnClickListener {
-            val currentFavorites = getFavorites()
-            val updatedSet: Set<String>
-            val newState: Boolean
-
-            if (currentFavorites.contains(recipeId)) {
-                // Удаляем из избранного
-                updatedSet = currentFavorites - recipeId
-                newState = false
-            } else {
-                // Добавляем в избранное
-                updatedSet = currentFavorites + recipeId
-                newState = true
-            }
-            saveFavorites(updatedSet)
-            updateFavoriteIcon(newState)
+            val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
+            viewModel.onFavoritesClicked(recipeId)
         }
     }
 
-    fun initRecycler(recipe: Recipe?) {
-        val ingredientsAdapter =
-            recipe?.ingredients?.let { IngredientsAdapter(it) }
-        binding.rvIngredients.adapter = ingredientsAdapter
+    fun initRecycler() {
 
-        val methodAdapter =
-            recipe?.method?.let { MethodAdapter(it) }
-        binding.rvMethod.adapter = methodAdapter
+        var ingredientsAdapter: IngredientsAdapter? = null
+        var methodAdapter: MethodAdapter? = null
 
         val divider = MaterialDividerItemDecoration(
             requireContext(),
@@ -114,6 +82,17 @@ class RecipeFragment : Fragment() {
         )
         binding.rvIngredients.addItemDecoration(divider)
         binding.rvMethod.addItemDecoration(divider)
+
+        viewModel.selectedRecipe.observe(viewLifecycleOwner){state ->
+            ingredientsAdapter =
+                IngredientsAdapter(state.ingredients)
+            binding.rvIngredients.adapter = ingredientsAdapter
+
+            methodAdapter =
+                MethodAdapter(state.method)
+            binding.rvMethod.adapter = methodAdapter
+        }
+
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar?,
@@ -133,28 +112,6 @@ class RecipeFragment : Fragment() {
             }
 
         })
-    }
-
-    fun saveFavorites(idCollection: Set<String>) {
-        val sharedPref =
-            requireActivity().getSharedPreferences(
-                Constants.FAVORITES_PREFS_NAME,
-                Context.MODE_PRIVATE
-            )
-        sharedPref.edit {
-            putStringSet(Constants.FAVORITES_KEY, idCollection)
-            apply()
-        }
-    }
-
-    fun getFavorites(): MutableSet<String> {
-        val sharedPref =
-            requireActivity().getSharedPreferences(
-                Constants.FAVORITES_PREFS_NAME,
-                Context.MODE_PRIVATE
-            )
-        val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
-        return HashSet(storedSet)
     }
 
     override fun onDestroyView() {
