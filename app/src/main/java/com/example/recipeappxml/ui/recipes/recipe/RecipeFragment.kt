@@ -24,8 +24,6 @@ class RecipeFragment : Fragment() {
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
 
-    // currentQuantity УДАЛЁН — живёт в стейте ViewModel
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRecipeBinding.inflate(inflater, container, false)
         return binding.root
@@ -48,8 +46,8 @@ class RecipeFragment : Fragment() {
     }
 
     private fun initRecycler() {
-        ingredientsAdapter = IngredientsAdapter(emptyList())
-        methodAdapter = MethodAdapter(emptyList())
+        ingredientsAdapter = IngredientsAdapter(mutableListOf())
+        methodAdapter = MethodAdapter(mutableListOf())
 
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         binding.rvIngredients.addItemDecoration(divider)
@@ -87,14 +85,8 @@ class RecipeFragment : Fragment() {
             binding.seekBar.progress = state.portionsCount
             binding.amount.text = state.portionsCount.toString()
 
-            // Адаптеры
-            ingredientsAdapter = IngredientsAdapter(state.ingredients).also {
-                it.updateIngredients(state.portionsCount)
-            }
-            binding.rvIngredients.adapter = ingredientsAdapter
-
-            methodAdapter = MethodAdapter(state.method)
-            binding.rvMethod.adapter = methodAdapter
+            ingredientsAdapter?.updateData(state.ingredients, state.portionsCount)
+            methodAdapter?.updateData(state.method)
         }
     }
 
