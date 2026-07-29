@@ -30,6 +30,11 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         mutableSelectedRecipe.value = recipe
     }
 
+    fun onPortionsCountChanged(count: Int) {
+        val current = mutableSelectedRecipe.value ?: return
+        mutableSelectedRecipe.value = current.copy(portionsCount = count)
+    }
+
 /*
     sealed interface RecipeScreenState {
         object Loading : RecipeScreenState // Показываем спиннер

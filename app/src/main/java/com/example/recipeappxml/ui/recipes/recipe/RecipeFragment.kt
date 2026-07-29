@@ -20,18 +20,13 @@ class RecipeFragment : Fragment() {
 
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = requireNotNull(_binding)
-
     private val viewModel: RecipeViewModel by viewModels()
-
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
 
-    private var currentQuantity: Int = 1
+    // currentQuantity УДАЛЁН — живёт в стейте ViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRecipeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -42,7 +37,7 @@ class RecipeFragment : Fragment() {
         viewModel.loadRecipe(recipeId)
         initRecycler()
         initFavoriteButton()
-        observeRecipe()
+        initUI()
     }
 
     private fun initFavoriteButton() {
@@ -56,10 +51,7 @@ class RecipeFragment : Fragment() {
         ingredientsAdapter = IngredientsAdapter(emptyList())
         methodAdapter = MethodAdapter(emptyList())
 
-        val divider = MaterialDividerItemDecoration(
-            requireContext(),
-            LinearLayoutManager.VERTICAL
-        )
+        val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         binding.rvIngredients.addItemDecoration(divider)
         binding.rvMethod.addItemDecoration(divider)
         binding.rvIngredients.adapter = ingredientsAdapter
@@ -67,8 +59,9 @@ class RecipeFragment : Fragment() {
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                ingredientsAdapter?.updateIngredients(progress)
-                currentQuantity = progress
+                if (fromUser) {
+                    viewModel.onPortionsCountChanged(progress)
+                }
                 binding.amount.text = progress.toString()
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -76,10 +69,8 @@ class RecipeFragment : Fragment() {
         })
     }
 
-    private fun observeRecipe() {
+    private fun initUI() {
         viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
-            Log.i("!!!", state.isFavorite.toString())
-
             // UI
             binding.recipeName.text = state.title
             try {
@@ -92,8 +83,13 @@ class RecipeFragment : Fragment() {
             }
             updateFavoriteIcon(state.isFavorite)
 
+            // Синхронизируем SeekBar и счётчик со стейтом
+            binding.seekBar.progress = state.portionsCount
+            binding.amount.text = state.portionsCount.toString()
+
+            // Адаптеры
             ingredientsAdapter = IngredientsAdapter(state.ingredients).also {
-                it.updateIngredients(currentQuantity)
+                it.updateIngredients(state.portionsCount)
             }
             binding.rvIngredients.adapter = ingredientsAdapter
 
