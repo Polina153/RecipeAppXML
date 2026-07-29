@@ -5,13 +5,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeappxml.databinding.ItemMethodBinding
 
-class MethodAdapter(private val dataSet: List<String>) :
+class MethodAdapter(private val dataSet: MutableList<String>) :
     RecyclerView.Adapter<MethodAdapter.ViewHolder>() {
 
     private var itemClickListener: OnItemClickListener? = null
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         itemClickListener = listener
+    }
+
+    fun updateData(methods: List<String>) {
+        dataSet.clear()
+        dataSet.addAll(methods)
+        notifyDataSetChanged()
     }
 
     class ViewHolder(private val binding: ItemMethodBinding) :

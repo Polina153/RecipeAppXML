@@ -7,7 +7,7 @@ import com.example.recipeappxml.databinding.ItemIngredientBinding
 import com.example.recipeappxml.model.Ingredient
 import java.util.Locale
 
-class IngredientsAdapter(private val dataSet: List<Ingredient>) :
+class IngredientsAdapter(private val dataSet: MutableList<Ingredient>) :
     RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
 
 
@@ -16,6 +16,13 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         itemClickListener = listener
+    }
+
+    fun updateData(ingredients: List<Ingredient>, portionCount: Int) {
+        dataSet.clear()
+        dataSet.addAll(ingredients)
+        quantity = portionCount
+        notifyDataSetChanged()
     }
 
     class ViewHolder(private val binding: ItemIngredientBinding) :
@@ -63,11 +70,6 @@ class IngredientsAdapter(private val dataSet: List<Ingredient>) :
 
     fun interface OnItemClickListener {
         fun onItemClick(ingredient: Ingredient)
-    }
-
-    fun updateIngredients(progress: Int) {
-        quantity = progress
-        notifyDataSetChanged()
     }
 
     // Return the size of your dataset (invoked by the layout manager)
