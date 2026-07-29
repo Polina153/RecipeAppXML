@@ -23,6 +23,11 @@ class RecipeFragment : Fragment() {
 
     private val viewModel: RecipeViewModel by viewModels()
 
+    private var ingredientsAdapter: IngredientsAdapter? = null
+    private var methodAdapter: MethodAdapter? = null
+
+    private var currentQuantity: Int = 1
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,46 +40,21 @@ class RecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
         viewModel.loadRecipe(recipeId)
-        initUI()
         initRecycler()
-
+        initFavoriteButton()
+        observeRecipe()
     }
 
-    private fun updateFavoriteIcon(isFavorite: Boolean) {
-        val iconRes = if (isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
-        binding.favoriteButton.setImageResource(iconRes)
-    }
-
-
-    fun initUI() {
-        viewModel.selectedRecipe.observe(viewLifecycleOwner) {
-            Log.i("!!!", it.isFavorite.toString())
-
-            binding.recipeName.text = it.title
-
-            try {
-                it.imageUrl?.let { requireContext().assets.open(it) }.use {
-                    val drawable = Drawable.createFromStream(it, null)
-                    binding.recipeImage.setImageDrawable(drawable)
-                }
-            } catch (e: IOException) {
-                Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
-            }
-
-            updateFavoriteIcon(it.isFavorite)
-        }
-
-        // 2. Вешаем клик на сердечко
+    private fun initFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
             val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
             viewModel.onFavoritesClicked(recipeId)
         }
     }
 
-    fun initRecycler() {
-
-        var ingredientsAdapter: IngredientsAdapter? = null
-        var methodAdapter: MethodAdapter? = null
+    private fun initRecycler() {
+        ingredientsAdapter = IngredientsAdapter(emptyList())
+        methodAdapter = MethodAdapter(emptyList())
 
         val divider = MaterialDividerItemDecoration(
             requireContext(),
@@ -82,36 +62,49 @@ class RecipeFragment : Fragment() {
         )
         binding.rvIngredients.addItemDecoration(divider)
         binding.rvMethod.addItemDecoration(divider)
-
-        viewModel.selectedRecipe.observe(viewLifecycleOwner){state ->
-            ingredientsAdapter =
-                IngredientsAdapter(state.ingredients)
-            binding.rvIngredients.adapter = ingredientsAdapter
-
-            methodAdapter =
-                MethodAdapter(state.method)
-            binding.rvMethod.adapter = methodAdapter
-        }
+        binding.rvIngredients.adapter = ingredientsAdapter
+        binding.rvMethod.adapter = methodAdapter
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(
-                seekBar: SeekBar?,
-                progress: Int,
-                fromUser: Boolean
-            ) {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 ingredientsAdapter?.updateIngredients(progress)
+                currentQuantity = progress
                 binding.amount.text = progress.toString()
             }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                //TODO("Not yet implemented")
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                //TODO("Not yet implemented")
-            }
-
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+    }
+
+    private fun observeRecipe() {
+        viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
+            Log.i("!!!", state.isFavorite.toString())
+
+            // UI
+            binding.recipeName.text = state.title
+            try {
+                state.imageUrl?.let { requireContext().assets.open(it) }.use {
+                    val drawable = Drawable.createFromStream(it, null)
+                    binding.recipeImage.setImageDrawable(drawable)
+                }
+            } catch (e: IOException) {
+                Log.e("RecipeFragment", "Ошибка загрузки изображения", e)
+            }
+            updateFavoriteIcon(state.isFavorite)
+
+            ingredientsAdapter = IngredientsAdapter(state.ingredients).also {
+                it.updateIngredients(currentQuantity)
+            }
+            binding.rvIngredients.adapter = ingredientsAdapter
+
+            methodAdapter = MethodAdapter(state.method)
+            binding.rvMethod.adapter = methodAdapter
+        }
+    }
+
+    private fun updateFavoriteIcon(isFavorite: Boolean) {
+        val iconRes = if (isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_empty
+        binding.favoriteButton.setImageResource(iconRes)
     }
 
     override fun onDestroyView() {
