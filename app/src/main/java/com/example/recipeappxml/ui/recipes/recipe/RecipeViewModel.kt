@@ -3,6 +3,7 @@ package com.example.recipeappxml.ui.recipes.recipe
 
 import android.app.Application
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
@@ -35,12 +36,12 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         mutableSelectedRecipe.value = current.copy(portionsCount = count)
     }
 
-/*
-    sealed interface RecipeScreenState {
-        object Loading : RecipeScreenState // Показываем спиннер
-        data class Success(val data: RecipeState) : RecipeScreenState // Показываем контент
-        data class Error(val message: String) : RecipeScreenState // Показываем сообщение об ошибке
-    }*/
+    /*
+        sealed interface RecipeScreenState {
+            object Loading : RecipeScreenState // Показываем спиннер
+            data class Success(val data: RecipeState) : RecipeScreenState // Показываем контент
+            data class Error(val message: String) : RecipeScreenState // Показываем сообщение об ошибке
+        }*/
 
     data class RecipeState(
         val title: String = "",
@@ -48,6 +49,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         var portionsCount: Int = 1,
         val ingredients: List<Ingredient> = emptyList(),
         val method: List<String> = emptyList(),
+        val recipeImage: Drawable? = null,
         val imageUrl: String? = null
     )
 
@@ -71,12 +73,24 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                     portionsCount = mutableSelectedRecipe.value?.portionsCount ?: 1,
                     ingredients = recipeFromRepo.ingredients,
                     method = recipeFromRepo.method,
+                    recipeImage = loadRecipeImage(recipeFromRepo.imageUrl),
                     imageUrl = recipeFromRepo.imageUrl
                 )
                 mutableSelectedRecipe.value = finalState
             }
         } catch (e: Exception) {
             Log.e("!!!", "Ошибка загрузки рецепта", e)
+        }
+    }
+
+    private fun loadRecipeImage(imageUrl: String?): Drawable? {
+        if (imageUrl == null) return null
+        return try {
+            val inputStream = getApplication<Application>().assets.open(imageUrl)
+            Drawable.createFromStream(inputStream, null)
+        } catch (e: Exception) {
+            Log.e("!!!", "Изображение не загрузилось: $e")
+            null
         }
     }
 

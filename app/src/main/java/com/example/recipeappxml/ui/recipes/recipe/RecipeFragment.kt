@@ -1,8 +1,6 @@
 package com.example.recipeappxml.ui.recipes.recipe
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +12,6 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
-import java.io.IOException
 
 class RecipeFragment : Fragment() {
 
@@ -71,14 +68,15 @@ class RecipeFragment : Fragment() {
         viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
             // UI
             binding.recipeName.text = state.title
-            try {
+            binding.recipeImage.setImageDrawable(state.recipeImage)
+            /*try {
                 state.imageUrl?.let { requireContext().assets.open(it) }.use {
                     val drawable = Drawable.createFromStream(it, null)
                     binding.recipeImage.setImageDrawable(drawable)
                 }
             } catch (e: IOException) {
                 Log.e("RecipeFragment", "Ошибка загрузки изображения", e)
-            }
+            }*/
             updateFavoriteIcon(state.isFavorite)
 
             // Синхронизируем SeekBar и счётчик со стейтом
