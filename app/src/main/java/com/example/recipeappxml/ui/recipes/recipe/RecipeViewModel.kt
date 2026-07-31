@@ -87,7 +87,13 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         if (imageUrl == null) return null
         return try {
             val inputStream = getApplication<Application>().assets.open(imageUrl)
-            Drawable.createFromStream(inputStream, null)
+            inputStream.use {
+                val drawable = Drawable.createFromStream(it, null)
+                if (drawable == null) {
+                    Log.e("!!!", "Не удалось создать Drawable из $imageUrl")
+                }
+                drawable
+            }
         } catch (e: Exception) {
             Log.e("!!!", "Изображение не загрузилось: $e")
             null

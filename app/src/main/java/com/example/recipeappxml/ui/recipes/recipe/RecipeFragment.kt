@@ -69,14 +69,7 @@ class RecipeFragment : Fragment() {
             // UI
             binding.recipeName.text = state.title
             binding.recipeImage.setImageDrawable(state.recipeImage)
-            /*try {
-                state.imageUrl?.let { requireContext().assets.open(it) }.use {
-                    val drawable = Drawable.createFromStream(it, null)
-                    binding.recipeImage.setImageDrawable(drawable)
-                }
-            } catch (e: IOException) {
-                Log.e("RecipeFragment", "Ошибка загрузки изображения", e)
-            }*/
+
             updateFavoriteIcon(state.isFavorite)
 
             // Синхронизируем SeekBar и счётчик со стейтом
