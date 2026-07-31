@@ -30,7 +30,6 @@ class RecipeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
         viewModel.loadRecipe(recipeId)
-        initRecycler()
         initFavoriteButton()
         initUI()
     }
@@ -42,7 +41,7 @@ class RecipeFragment : Fragment() {
         }
     }
 
-    private fun initRecycler() {
+    private fun initUI() {
         ingredientsAdapter = IngredientsAdapter(mutableListOf())
         methodAdapter = MethodAdapter(mutableListOf())
 
@@ -57,14 +56,11 @@ class RecipeFragment : Fragment() {
                 if (fromUser) {
                     viewModel.onPortionsCountChanged(progress)
                 }
-                binding.amount.text = progress.toString()
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
-    }
 
-    private fun initUI() {
         viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
             // UI
             binding.recipeName.text = state.title
