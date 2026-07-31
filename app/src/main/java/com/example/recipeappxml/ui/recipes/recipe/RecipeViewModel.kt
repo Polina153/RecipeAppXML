@@ -58,8 +58,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
      * Вызывается один раз при создании фрагмента.
      */
     fun loadRecipe(recipeId: Int) {
-        // TODO: Заменить заглушку на реальный вызов API/БД через корутины
-        // Для примера используем синхронный вызов stub-репозитория
         try {
             val recipeFromRepo = RecipesRepositoryStub.getRecipeById(recipeId)
             if (recipeFromRepo != null) {
@@ -129,5 +127,4 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         if (isFavorite) favorites.add(recipeId) else favorites.remove(recipeId)
         prefs.edit { putStringSet(Constants.FAVORITES_KEY, favorites) }
     }
-
 }
