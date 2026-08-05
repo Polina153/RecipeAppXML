@@ -7,16 +7,16 @@ import com.example.recipeappxml.databinding.ItemIngredientBinding
 import com.example.recipeappxml.model.Ingredient
 import java.util.Locale
 
-class IngredientsAdapter(private val dataSet: MutableList<Ingredient>) :
+class IngredientsAdapter(var dataSet: MutableList<Ingredient>) :
     RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
 
 
     private var quantity: Int = 1
     private var itemClickListener: OnItemClickListener? = null
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
+    /*fun setOnItemClickListener(listener: OnItemClickListener) {
         itemClickListener = listener
-    }
+    }*/
 
     fun updateData(ingredients: List<Ingredient>, portionCount: Int) {
         dataSet.clear()
