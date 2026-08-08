@@ -1,13 +1,17 @@
 package com.example.recipeappxml.ui.categories
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
-import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListFragment
 
@@ -15,6 +19,10 @@ class CategoriesListFragment : Fragment() {
 
     private var _binding: FragmentListCategoriesBinding? = null
     private val binding get() = requireNotNull(_binding)
+    private val viewModel: CategoriesListViewModel by viewModels {
+        CategoriesListViewModelFactory()
+    }
+    private val adapter by lazy { CategoriesListAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,22 +34,26 @@ class CategoriesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initRecycler()
-    }
-
-    fun initRecycler() {
-        val categoriesListAdapter =
-            CategoriesListAdapter(RecipesRepositoryStub.Companion.getCategories())
-        categoriesListAdapter.setOnItemClickListener {
+        binding.rvCategories.adapter = adapter
+        adapter.setOnItemClickListener {
             openRecipesByCategoryId(it)
         }
-        binding.rvCategories.adapter = categoriesListAdapter
+
+        viewModel.categoryList.observe(viewLifecycleOwner) { state ->
+            if (state.error != null) {
+                Log.e("!!!", "Ошибка с загрузкой списка категорий")
+            } else {
+                adapter.submitList(state.categories)
+                val isEmpty = state.categories.isEmpty()
+                binding.rvCategories.isVisible = !isEmpty
+                binding.tvEmptyState.isVisible = isEmpty
+            }
+        }
     }
 
-    fun openRecipesByCategoryId(categoryId: Int) {
+    private fun openRecipesByCategoryId(categoryId: Int) {
 
-        val categories = RecipesRepositoryStub.Companion.getCategories()
-        val category = categories.find { it.id == categoryId } ?: return
+        val category = adapter.currentList.find { it.id == categoryId } ?: return
 
         val categoryName: String = category.title
         val categoryImage = category.imageUrl
@@ -60,5 +72,16 @@ class CategoriesListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+}
+
+class CategoriesListViewModelFactory : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CategoriesListViewModel::class.java)) {
+            return CategoriesListViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

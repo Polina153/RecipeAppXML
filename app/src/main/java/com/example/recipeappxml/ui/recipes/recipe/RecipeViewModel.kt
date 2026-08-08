@@ -2,14 +2,12 @@ package com.example.recipeappxml.ui.recipes.recipe
 
 
 import android.app.Application
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.recipeappxml.data.Constants
+import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.model.Ingredient
 
@@ -21,6 +19,8 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     // Публичное свойство — только для чтения, безопасно для UI
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
+
+    private val prefsManager = FavoritePrefsManager(getApplication())
 
     init {
         Log.i("!!!", "ViewModel инициализирована")
@@ -60,24 +60,19 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     fun loadRecipe(recipeId: Int) {
         try {
             val recipeFromRepo = RecipesRepositoryStub.getRecipeById(recipeId)
-            if (recipeFromRepo != null) {
-                // Получаем актуальный статус избранного
-                val favoritesSet = getFavorites()
 
-                // Создаем итоговый объект состояния, проинициализировав нужные поля
-                val finalState = RecipeState(
-                    title = recipeFromRepo.title,
-                    isFavorite = favoritesSet.contains(recipeId.toString()), // 1. Проверка избранного
-                    portionsCount = mutableSelectedRecipe.value?.portionsCount ?: 1,
-                    ingredients = recipeFromRepo.ingredients,
-                    method = recipeFromRepo.method,
-                    recipeImage = loadRecipeImage(recipeFromRepo.imageUrl),
-                    imageUrl = recipeFromRepo.imageUrl
-                )
-                mutableSelectedRecipe.value = finalState
-            }
+            val finalState = RecipeState(
+                title = recipeFromRepo.title,
+                isFavorite = prefsManager.isFavorite(recipeId),
+                portionsCount = mutableSelectedRecipe.value?.portionsCount ?: 1,
+                ingredients = recipeFromRepo.ingredients,
+                method = recipeFromRepo.method,
+                recipeImage = loadRecipeImage(recipeFromRepo.imageUrl),
+                imageUrl = recipeFromRepo.imageUrl
+            )
+            mutableSelectedRecipe.value = finalState
         } catch (e: Exception) {
-            Log.e("!!!", "Ошибка загрузки рецепта", e)
+            Log.e("RecipeViewModel", "Ошибка загрузки рецепта", e)
         }
     }
 
@@ -98,16 +93,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun getFavorites(): MutableSet<String> {
-        val sharedPref =
-            getApplication<Application>().applicationContext.getSharedPreferences(
-                Constants.FAVORITES_PREFS_NAME,
-                Context.MODE_PRIVATE
-            )
-        val storedSet = sharedPref.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
-        return HashSet(storedSet)
-    }
-
     fun onFavoritesClicked(recipeId: Int) {
         val currentState = mutableSelectedRecipe.value ?: return
         val newIsFavorite = !currentState.isFavorite
@@ -115,16 +100,14 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         val newState = currentState.copy(isFavorite = newIsFavorite)
         mutableSelectedRecipe.value = newState
 
-        saveFavorites(recipeId.toString(), newIsFavorite)
+        saveFavorites(recipeId, newIsFavorite)
     }
 
-    private fun saveFavorites(recipeId: String, isFavorite: Boolean) {
-        val prefs = getApplication<Application>().getSharedPreferences(
-            Constants.FAVORITES_PREFS_NAME,
-            Context.MODE_PRIVATE
-        )
-        val favorites = getFavorites().toMutableSet()
-        if (isFavorite) favorites.add(recipeId) else favorites.remove(recipeId)
-        prefs.edit { putStringSet(Constants.FAVORITES_KEY, favorites) }
+    private fun saveFavorites(recipeId: Int, isFavorite: Boolean) {
+        if (isFavorite) {
+            prefsManager.addToFavorites(recipeId)
+        } else {
+            prefsManager.removeFromFavorites(recipeId)
+        }
     }
 }

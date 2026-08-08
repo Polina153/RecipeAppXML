@@ -36,6 +36,18 @@
         app:layout_constraintStart_toStartOf="@id/recipe_image"
         />
 
+
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recipes_stub"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recipe_image" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecipes"
         android:layout_width="match_parent"
