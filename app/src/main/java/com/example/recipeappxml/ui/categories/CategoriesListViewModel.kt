@@ -3,10 +3,11 @@ package com.example.recipeappxml.ui.categories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.model.Category
 
-class CategoriesListViewModel: ViewModel() {
+class CategoriesListViewModel: ViewModel(), ViewModelProvider.Factory {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val _categoryList = MutableLiveData<CategoryListUiState>()

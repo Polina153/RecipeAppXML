@@ -8,19 +8,20 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListFragment
+import com.example.recipeappxml.utils.GenericViewModelFactory
 
 class CategoriesListFragment : Fragment() {
 
     private var _binding: FragmentListCategoriesBinding? = null
     private val binding get() = requireNotNull(_binding)
     private val viewModel: CategoriesListViewModel by viewModels {
-        CategoriesListViewModelFactory()
+        GenericViewModelFactory {
+            CategoriesListViewModel()
+        }
     }
     private val adapter by lazy { CategoriesListAdapter() }
 
@@ -75,6 +76,7 @@ class CategoriesListFragment : Fragment() {
     }
 }
 
+/*
 class CategoriesListViewModelFactory : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -84,4 +86,4 @@ class CategoriesListViewModelFactory : ViewModelProvider.Factory {
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-}
+}*/

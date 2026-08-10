@@ -9,12 +9,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
+import com.example.recipeappxml.utils.GenericViewModelFactory
 import java.io.IOException
 
 class RecipesListFragment : Fragment() {
@@ -22,7 +21,9 @@ class RecipesListFragment : Fragment() {
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
     private val viewModel: RecipesListViewModel by viewModels {
-        RecipesViewModelFactory(requireArguments().getInt(Constants.ID_KEY))
+        GenericViewModelFactory {
+            RecipesListViewModel(requireArguments().getInt(Constants.ID_KEY))
+        }
     }
     private val adapter by lazy { RecipesListAdapter() }
 
@@ -83,6 +84,7 @@ class RecipesListFragment : Fragment() {
     }
 }
 
+/*
 class RecipesViewModelFactory(
     private val categoryId: Int
 ) : ViewModelProvider.Factory {
@@ -94,4 +96,4 @@ class RecipesViewModelFactory(
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
-}
+}*/

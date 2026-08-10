@@ -4,12 +4,13 @@ package com.example.recipeappxml.ui.recipes.favorites
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.model.Recipe
 
 
-class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel() {
+class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(), ViewModelProvider.Factory {
 
     private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
     val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes

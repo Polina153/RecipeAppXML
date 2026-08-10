@@ -3,10 +3,11 @@ package com.example.recipeappxml.ui.recipes.recipes_list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.model.Recipe
 
-class RecipesListViewModel(private val categoryId: Int) : ViewModel() {
+class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModelProvider.Factory {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val _recipeList = MutableLiveData<RecipeListUiState>()
