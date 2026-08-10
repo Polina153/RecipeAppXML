@@ -1,37 +1,46 @@
 package com.example.recipeappxml.ui.recipes.favorites
 
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.recipeappxml.data.Constants
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.model.Recipe
 
 
-class FavoritesViewModel(application: Application) : AndroidViewModel(application) {
+class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(), ViewModelProvider.Factory {
 
-    private val _favoriteRecipes = MutableLiveData<List<Recipe>>()
-    val favoriteRecipes: LiveData<List<Recipe>> get() = _favoriteRecipes
+    private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
+    val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes
 
     init {
         loadFavorites()
     }
 
-    fun loadFavorites() {
-        val prefs = getApplication<Application>().getSharedPreferences(
-            Constants.FAVORITES_PREFS_NAME,
-            Context.MODE_PRIVATE
-        )
-        val favoriteIds = prefs.getStringSet(Constants.FAVORITES_KEY, emptySet()) ?: emptySet()
+    data class FavoritesUiState(
+        val isLoading: Boolean = false,
+        val recipes: List<Recipe> = emptyList(),
+        val error: Throwable? = null
+    )
 
-        val recipes = favoriteIds.mapNotNull { idString ->
-            idString.toIntOrNull()?.let { id ->
-                RecipesRepositoryStub.getRecipeById(id)
+    fun loadFavorites() {
+
+        _favoriteRecipes.value = FavoritesUiState(isLoading = true)
+
+        try {
+            val favoriteIds = prefsManager.getAllFavorites()
+
+            val recipes = favoriteIds.mapNotNull { idString ->
+                idString.toIntOrNull()?.let { id ->
+                    RecipesRepositoryStub.getRecipeById(id)
+                }
             }
+
+            _favoriteRecipes.value = FavoritesUiState(recipes = recipes, isLoading = false)
+        } catch (e: Exception) {
+            _favoriteRecipes.value = FavoritesUiState(error = e, isLoading = false)
         }
-        _favoriteRecipes.value = recipes
     }
 }

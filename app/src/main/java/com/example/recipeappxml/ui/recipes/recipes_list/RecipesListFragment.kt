@@ -6,22 +6,26 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
-import com.example.recipeappxml.data.RecipesRepositoryStub
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
+import com.example.recipeappxml.utils.GenericViewModelFactory
 import java.io.IOException
 
 class RecipesListFragment : Fragment() {
 
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
-
-    var categoryId: Int? = null
-    var categoryName: String? = null
-    var categoryImage: String? = null
+    private val viewModel: RecipesListViewModel by viewModels {
+        GenericViewModelFactory {
+            RecipesListViewModel(requireArguments().getInt(Constants.ID_KEY))
+        }
+    }
+    private val adapter by lazy { RecipesListAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,12 +37,25 @@ class RecipesListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireArguments().let { args ->
-            categoryId = args.getInt(Constants.ID_KEY)
-            categoryName = args.getString(Constants.NAME_KEY)
-            categoryImage = args.getString(Constants.IMAGE_KEY)
+        binding.rvRecipes.adapter = adapter
+        adapter.setOnItemClickListener { recipeId ->
+            openRecipeByRecipeId(recipeId)
         }
-        binding.recipesHeadingText.text = categoryName
+
+        viewModel.recipeList.observe(viewLifecycleOwner) { state ->
+            if (state.error != null) {
+                Log.e("!!!", "Ошибка с загрузкой списка рецептов")
+            } else {
+                adapter.submitList(state.recipes)
+                val isEmpty = state.recipes.isEmpty()
+                binding.rvRecipes.isVisible = !isEmpty
+                binding.tvEmptyState.isVisible = isEmpty
+            }
+        }
+
+        val categoryName = requireArguments().getString(Constants.NAME_KEY)
+        val categoryImage = requireArguments().getString(Constants.IMAGE_KEY)
+        binding.recipesHeadingText.text = categoryName.orEmpty()
 
         try {
             binding.recipeImage.context.assets.open(categoryImage.orEmpty()).use {
@@ -48,24 +65,11 @@ class RecipesListFragment : Fragment() {
         } catch (e: IOException) {
             Log.e("RecipesHeadingImage", "Ошибка загрузки изображения", e)
         }
-        initRecycler()
-    }
-
-    private fun initRecycler() {
-        val recipesListAdapter = RecipesListAdapter(
-            RecipesRepositoryStub.Companion.getRecipesByCategoryId(categoryId ?: 0)
-        )
-        recipesListAdapter.setOnItemClickListener { recipeId ->
-            openRecipeByRecipeId(recipeId)
-        }
-        binding.rvRecipes.adapter = recipesListAdapter
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        //val recipe = RecipesRepositoryStub.Companion.getRecipeById(recipeId)
         val bundle = Bundle()
         bundle.putInt(Constants.RECIPE_ID_KEY, recipeId)
-        //bundle.putParcelable(Constants.ARG_RECIPE, recipe)
         val fragment = RecipeFragment()
         fragment.arguments = bundle
 
@@ -79,3 +83,17 @@ class RecipesListFragment : Fragment() {
         _binding = null
     }
 }
+
+/*
+class RecipesViewModelFactory(
+    private val categoryId: Int
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(RecipesListViewModel::class.java)) {
+            return RecipesListViewModel(categoryId) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}*/

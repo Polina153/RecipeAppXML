@@ -4,18 +4,35 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeappxml.databinding.ItemCategoryBinding
 import com.example.recipeappxml.model.Category
 import java.io.IOException
 
-class CategoriesListAdapter(private val dataSet: List<Category>) :
-    RecyclerView.Adapter<CategoriesListAdapter.ViewHolder>() {
+class CategoriesListAdapter :
+    ListAdapter<Category, CategoriesListAdapter.ViewHolder>(CATEGORY_COMPARATOR) {
 
     private var itemClickListener: OnItemClickListener? = null
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         itemClickListener = listener
+    }
+
+    // DiffUtil вычисляет разницу между старым и новым списком
+    companion object {
+        private val CATEGORY_COMPARATOR = object : DiffUtil.ItemCallback<Category>() {
+            override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
+                // Сравниваем по ID — уникальному идентификатору сущности
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
+                // Если весь объект равен (все поля совпадают), пересоздавать ViewHolder не нужно
+                return oldItem == newItem
+            }
+        }
     }
 
     /**
@@ -54,19 +71,15 @@ class CategoriesListAdapter(private val dataSet: List<Category>) :
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        val category = dataSet[position]
+        val category = getItem(position)
         viewHolder.bind(category)
         viewHolder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick(dataSet[position].id)
+            itemClickListener?.onItemClick(category.id)
         }
     }
 
     fun interface OnItemClickListener {
         fun onItemClick(categoryId: Int)
     }
-
-
-    // Return the size of your dataset (invoked by the layout manager)
-    override fun getItemCount() = dataSet.size
 
 }
