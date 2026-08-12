@@ -16,10 +16,6 @@
             android:id="@+id/action_favoritesFragment_to_recipeFragment"
             app:destination="@id/recipeFragment"
             />
-        <action
-            android:id="@+id/action_favoritesFragment_to_categoriesListFragment"
-            app:destination="@id/categoriesListFragment"
-            />
     </fragment>
     <fragment
         android:id="@+id/categoriesListFragment"
