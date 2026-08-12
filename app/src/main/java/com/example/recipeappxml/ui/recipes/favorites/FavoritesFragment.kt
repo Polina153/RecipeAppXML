@@ -72,17 +72,3 @@ class FavoritesFragment : Fragment() {
         _binding = null
     }
 }
-
-/*
-class FavoritesViewModelFactory(
-    private val prefsManager: FavoritePrefsManager
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
-            return FavoritesViewModel(prefsManager) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}*/

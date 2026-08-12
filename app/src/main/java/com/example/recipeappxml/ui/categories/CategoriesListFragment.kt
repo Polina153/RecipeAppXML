@@ -73,15 +73,3 @@ class CategoriesListFragment : Fragment() {
         _binding = null
     }
 }
-
-/*
-class CategoriesListViewModelFactory : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CategoriesListViewModel::class.java)) {
-            return CategoriesListViewModel() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}*/
