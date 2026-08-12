@@ -51,4 +51,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.parcelize.runtime)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
 }

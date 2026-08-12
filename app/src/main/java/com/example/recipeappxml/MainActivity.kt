@@ -5,9 +5,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.findNavController
 import com.example.recipeappxml.databinding.ActivityMainBinding
-import com.example.recipeappxml.ui.categories.CategoriesListFragment
-import com.example.recipeappxml.ui.recipes.favorites.FavoritesFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,23 +25,12 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.mainContainer, CategoriesListFragment())
-                .commit()
-        }
-
         binding.categoriesButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.mainContainer, CategoriesListFragment())
-                .commit()
+            findNavController(R.id.nav_host_fragment).navigate(R.id.categoriesListFragment)
         }
 
         binding.favoritesButton.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.mainContainer, FavoritesFragment())
-                .commit()
+            findNavController(R.id.nav_host_fragment).navigate(R.id.favoritesFragment)
         }
-
     }
 }
