@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import com.example.recipeappxml.R
 import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
-import com.example.recipeappxml.ui.recipes.recipe.RecipeFragment
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
 import com.example.recipeappxml.utils.GenericViewModelFactory
 
@@ -64,10 +64,7 @@ class FavoritesFragment : Fragment() {
 
     private fun openRecipeByRecipeId(recipeId: Int) {
         val bundle = Bundle().apply { putInt(Constants.RECIPE_ID_KEY, recipeId) }
-        val fragment = RecipeFragment().apply { arguments = bundle }
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.mainContainer, fragment)
-            .commit()
+        view?.findNavController()?.navigate(R.id.recipeFragment, args = bundle)
     }
 
     override fun onDestroyView() {
