@@ -13,6 +13,10 @@
         tools:layout="@layout/fragment_favorites"
         >
         <action
+            android:id="@+id/action_favoritesFragment_to_categoriesListFragment"
+            app:destination="@id/categoriesListFragment"
+            />
+        <action
             android:id="@+id/action_favoritesFragment_to_recipeFragment"
             app:destination="@id/recipeFragment"
             />

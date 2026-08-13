@@ -43,6 +43,11 @@ class FavoritesFragment : Fragment() {
         adapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
         }
+        binding.backToCategories.setOnClickListener {
+            findNavController().navigate(
+                FavoritesFragmentDirections.actionFavoritesFragmentToCategoriesListFragment()
+            )
+        }
         observeFavorites()
     }
 
