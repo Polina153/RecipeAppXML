@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
-import com.example.recipeappxml.R
-import com.example.recipeappxml.data.Constants
+import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
@@ -21,7 +19,7 @@ class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = requireNotNull(_binding)
     private val viewModel: FavoritesViewModel by viewModels {
-        GenericViewModelFactory{
+        GenericViewModelFactory {
             FavoritesViewModel(
                 FavoritePrefsManager(requireContext().applicationContext)
             )
@@ -45,6 +43,11 @@ class FavoritesFragment : Fragment() {
         adapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
         }
+        binding.backToCategories.setOnClickListener {
+            findNavController().navigate(
+                FavoritesFragmentDirections.actionFavoritesFragmentToCategoriesListFragment()
+            )
+        }
         observeFavorites()
     }
 
@@ -63,8 +66,9 @@ class FavoritesFragment : Fragment() {
 
 
     private fun openRecipeByRecipeId(recipeId: Int) {
-        val bundle = Bundle().apply { putInt(Constants.RECIPE_ID_KEY, recipeId) }
-        view?.findNavController()?.navigate(R.id.recipeFragment, args = bundle)
+        findNavController().navigate(
+            FavoritesFragmentDirections.actionFavoritesFragmentToRecipeFragment(recipeId)
+        )
     }
 
     override fun onDestroyView() {
@@ -72,17 +76,3 @@ class FavoritesFragment : Fragment() {
         _binding = null
     }
 }
-
-/*
-class FavoritesViewModelFactory(
-    private val prefsManager: FavoritePrefsManager
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FavoritesViewModel::class.java)) {
-            return FavoritesViewModel(prefsManager) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}*/

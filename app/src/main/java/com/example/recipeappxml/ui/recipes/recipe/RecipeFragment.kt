@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.recipeappxml.R
-import com.example.recipeappxml.data.Constants
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
@@ -20,15 +20,20 @@ class RecipeFragment : Fragment() {
     private val viewModel: RecipeViewModel by viewModels()
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
+    private val recipeFragmentArgs: RecipeFragmentArgs by navArgs<RecipeFragmentArgs>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentRecipeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
+        val recipeId = recipeFragmentArgs.recipeId
         viewModel.loadRecipe(recipeId)
         initFavoriteButton()
         initUI()
@@ -36,8 +41,7 @@ class RecipeFragment : Fragment() {
 
     private fun initFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
-            val recipeId = requireArguments().getInt(Constants.RECIPE_ID_KEY, -1)
-            viewModel.onFavoritesClicked(recipeId)
+            viewModel.onFavoritesClicked(recipeFragmentArgs.recipeId)
         }
     }
 
@@ -51,7 +55,11 @@ class RecipeFragment : Fragment() {
         binding.rvIngredients.adapter = ingredientsAdapter
         binding.rvMethod.adapter = methodAdapter
 
-        binding.seekBar.setOnSeekBarChangeListener(PortionSeekBarListener{progress -> viewModel.onPortionsCountChanged(progress)})
+        binding.seekBar.setOnSeekBarChangeListener(PortionSeekBarListener { progress ->
+            viewModel.onPortionsCountChanged(
+                progress
+            )
+        })
 
         viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
             // UI
@@ -80,7 +88,8 @@ class RecipeFragment : Fragment() {
     }
 }
 
-class PortionSeekBarListener(val onChangeIngredients: (Int) -> Unit): SeekBar.OnSeekBarChangeListener{
+class PortionSeekBarListener(val onChangeIngredients: (Int) -> Unit) :
+    SeekBar.OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         if (fromUser) {
             onChangeIngredients(progress)

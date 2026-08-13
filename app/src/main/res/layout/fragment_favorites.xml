@@ -22,6 +22,18 @@
         >
 
     </ImageView>
+
+    <ImageButton
+        android:id="@+id/back_to_categories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_main"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/add_to_favorites"
+        android:src="@drawable/ic_share"
+        app:layout_constraintEnd_toEndOf="@id/recipe_image"
+        app:layout_constraintTop_toTopOf="@id/recipe_image"
+        />
     <!--TODO настроить, чтобы заголовок не был во всю длину строки-->
     <TextView
         android:id="@+id/favorites_heading_text"
@@ -46,7 +58,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recipe_image" />
+        app:layout_constraintTop_toBottomOf="@id/recipe_image"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecipes"
