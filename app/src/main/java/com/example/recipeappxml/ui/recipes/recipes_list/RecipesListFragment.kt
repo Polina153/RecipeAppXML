@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
-import com.example.recipeappxml.data.Constants
+import androidx.navigation.fragment.navArgs
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
 import java.io.IOException
@@ -19,9 +19,10 @@ class RecipesListFragment : Fragment() {
 
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
+    private val args: RecipesListFragmentArgs by navArgs()
     private val viewModel: RecipesListViewModel by viewModels {
         GenericViewModelFactory {
-            RecipesListViewModel(requireArguments().getInt(Constants.ID_KEY))
+            RecipesListViewModel(args.category.id)
         }
     }
     private val adapter by lazy { RecipesListAdapter() }
@@ -52,12 +53,10 @@ class RecipesListFragment : Fragment() {
             }
         }
 
-        val categoryName = requireArguments().getString(Constants.NAME_KEY)
-        val categoryImage = requireArguments().getString(Constants.IMAGE_KEY)
-        binding.recipesHeadingText.text = categoryName.orEmpty()
+        binding.recipesHeadingText.text = args.category.title
 
         try {
-            binding.recipeImage.context.assets.open(categoryImage.orEmpty()).use {
+            binding.recipeImage.context.assets.open(args.category.imageUrl).use {
                 val drawable = Drawable.createFromStream(it, null)
                 binding.recipeImage.setImageDrawable(drawable)
             }

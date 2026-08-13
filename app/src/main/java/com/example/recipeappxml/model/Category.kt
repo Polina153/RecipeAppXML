@@ -1,5 +1,6 @@
 package com.example.recipeappxml.model
 
+
 import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

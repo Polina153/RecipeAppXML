@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
-import com.example.recipeappxml.R
-import com.example.recipeappxml.data.Constants
+import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
 
@@ -54,18 +52,14 @@ class CategoriesListFragment : Fragment() {
 
     private fun openRecipesByCategoryId(categoryId: Int) {
 
-        val category = adapter.currentList.find { it.id == categoryId } ?: return
+        val category = adapter.currentList.find { it.id == categoryId }
+            ?: throw IllegalArgumentException("Category with id $categoryId not found")
 
-        val categoryName: String = category.title
-        val categoryImage = category.imageUrl
-
-        val bundle = Bundle().apply {
-            putInt(Constants.ID_KEY, categoryId)
-            putString(Constants.NAME_KEY, categoryName)
-            putString(Constants.IMAGE_KEY, categoryImage)
-        }
-
-        view?.findNavController()?.navigate(R.id.recipesListFragment, args = bundle)
+        findNavController().navigate(
+            CategoriesListFragmentDirections.actionCategoriesListFragmentToRecipesListFragment(
+                category
+            )
+        )
     }
 
     override fun onDestroyView() {
