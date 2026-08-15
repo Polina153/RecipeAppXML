@@ -1,17 +1,27 @@
 package com.example.recipeappxml
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import com.example.recipeappxml.databinding.ActivityMainBinding
+import com.example.recipeappxml.model.CategoryDto
+import kotlinx.serialization.json.Json
+import java.net.HttpURLConnection
+import java.net.URL
+
+private const val TAG = "NetworkLesson"
 
 class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = requireNotNull(_binding)
+
+    // URL вашего тестового API категорий
+    private val apiUrl = "https://recipes.androidsprint.ru/api/category"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +35,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        Log.d(TAG, "Метод onCreate() выполняется на потоке: ${Thread.currentThread().name}")
         binding.categoriesButton.setOnClickListener {
             findNavController(R.id.nav_host_fragment).navigate(R.id.categoriesListFragment)
         }
@@ -32,5 +43,58 @@ class MainActivity : AppCompatActivity() {
         binding.favoritesButton.setOnClickListener {
             findNavController(R.id.nav_host_fragment).navigate(R.id.favoritesFragment)
         }
+
+        Thread {
+            try {
+                Log.d(TAG, "Выполняю запрос на потоке: ${Thread.currentThread().name}")
+
+                // Вызываем функцию запроса
+                val categories = fetchCategories(apiUrl)
+
+                // Здесь можно обновить UI через runOnUiThread или вернуться в Coroutine Dispatcher.Main
+                Log.d(TAG, "Успешно получено данных: ${categories.size} шт.")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Ошибка при выполнении запроса", e)
+            }
+        }.start() // Обязательно вызываем .start(), чтобы поток запустился
+    }
+
+    /**
+     * Функция выполнения HTTP-запроса.
+     * Возвращает список объектов DTO.
+     */
+    private fun fetchCategories(urlString: String): List<CategoryDto> {
+        var urlConnection: HttpURLConnection? = null
+
+        return try {
+            val url = URL(urlString)
+            urlConnection = url.openConnection() as HttpURLConnection
+
+            urlConnection.requestMethod = "GET"
+            urlConnection.connectTimeout = 10000
+            urlConnection.readTimeout = 15000
+
+            if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+                // inputStream.bufferedReader().use { ... } гарантирует закрытие ридера В ЛЮБОМ СЛУЧАЕ
+                // даже если внутри блока произойдет исключение (OutOfMemoryError, SerializationException и т.д.)
+                val responseText = urlConnection.inputStream.bufferedReader().use { reader ->
+                    reader.readText()
+                }
+                // Десериализация JSON -> Kotlin Objects
+                json.decodeFromString<List<CategoryDto>>(responseText)
+
+            } else {
+                throw Exception("HTTP Error: ${urlConnection.responseCode}. Message: ${urlConnection.responseMessage}")
+            }
+
+        } finally {
+            // Соединение нужно закрывать всегда, независимо от успеха или ошибки выше
+            urlConnection?.disconnect()
+        }
+    }
+
+    companion object {
+        private val json = Json { ignoreUnknownKeys = true }
     }
 }
