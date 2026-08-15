@@ -12,6 +12,7 @@ import com.example.recipeappxml.model.CategoryDto
 import kotlinx.serialization.json.Json
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.jvm.java
 
 private const val TAG = "NetworkLesson"
 
@@ -69,7 +70,10 @@ class MainActivity : AppCompatActivity() {
 
         return try {
             val url = URL(urlString)
-            urlConnection = url.openConnection() as HttpURLConnection
+            val connection = url.openConnection()
+            urlConnection = requireNotNull(connection as? HttpURLConnection) {
+                "Unexpected URLConnection type for $url: ${connection::class.java}"
+            }
 
             urlConnection.requestMethod = "GET"
             urlConnection.connectTimeout = 10000
@@ -81,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                 val responseText = urlConnection.inputStream.bufferedReader().use { reader ->
                     reader.readText()
                 }
+                Log.d(TAG, "Тело responseText: $responseText.")
                 // Десериализация JSON -> Kotlin Objects
                 json.decodeFromString<List<CategoryDto>>(responseText)
 
