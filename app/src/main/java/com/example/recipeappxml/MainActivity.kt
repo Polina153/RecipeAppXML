@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             findNavController(R.id.nav_host_fragment).navigate(R.id.favoritesFragment)
         }
 
-        Thread {
+        threadPool.execute {
             try {
                 Log.d(TAG, "Выполняю запрос на потоке: ${Thread.currentThread().name}")
 
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Ошибка при выполнении запроса", e)
             }
-        }.start() // Обязательно вызываем .start(), чтобы поток запустился
+        }
     }
 
     private fun getRecipes(categories: List<CategoryDto>) {
@@ -142,6 +142,11 @@ class MainActivity : AppCompatActivity() {
             // Соединение нужно закрывать всегда, независимо от успеха или ошибки выше
             urlConnection?.disconnect()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        threadPool.shutdown()
     }
 
     companion object {
