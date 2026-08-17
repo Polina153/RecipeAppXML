@@ -104,6 +104,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Функция выполнения HTTP-запроса.
+     * Возвращает список объектов DTO.
+     */
     private fun fetchCategories(urlString: String): List<CategoryDto> {
         val request = Request.Builder()
             .url(urlString)
