@@ -122,6 +122,7 @@ class MainActivity : AppCompatActivity() {
 
             Log.d(TAG, "Тело responseText Categories: $jsonString.")
 
+            // Десериализация JSON -> Kotlin Objects
             return json.decodeFromString<List<CategoryDto>>(jsonString)
         }
     }
