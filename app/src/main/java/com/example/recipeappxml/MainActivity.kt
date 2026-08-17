@@ -2,6 +2,7 @@ package com.example.recipeappxml
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,9 +11,12 @@ import androidx.navigation.findNavController
 import com.example.recipeappxml.databinding.ActivityMainBinding
 import com.example.recipeappxml.model.CategoryDto
 import com.example.recipeappxml.model.RecipeDto
+import com.example.recipeappxml.utils.HttpException
 import kotlinx.serialization.json.Json
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
+import java.io.IOException
 import java.util.concurrent.Executors.newFixedThreadPool
 
 private const val TAG = "NetworkLesson"
@@ -26,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     private val apiUrl = "https://recipes.androidsprint.ru/api/category"
     private val apiRecipeId = "https://recipes.androidsprint.ru/api/category"
     private val threadPool = newFixedThreadPool(10)
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor { Log.d(TAG, "$it") }.apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }).build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +65,18 @@ class MainActivity : AppCompatActivity() {
 
                 // Здесь можно обновить UI через runOnUiThread или вернуться в Coroutine Dispatcher.Main
                 Log.d(TAG, "Успешно получено данных: ${categories.size} шт.")
+                if (categories.isEmpty()) {
+                    showError("Данные не найдены")
+                    return@execute
+                }
                 getRecipes(categories)
 
+            } catch (e: HttpException) {
+                Log.e(TAG, "HTTP-ошибка", e)
+                showError("Сервер временно недоступен, попробуйте позже")
             } catch (e: Exception) {
                 Log.e(TAG, "Ошибка при выполнении запроса", e)
+                showError("Проверьте интернет-соединение")
             }
         }
     }
@@ -71,77 +87,67 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchRecipe(categoryId: Int) {
-        var urlConnection: HttpURLConnection? = null
         try {
-            val url = URL("${apiRecipeId}/$categoryId/recipes")
-            val connection = url.openConnection()
-            urlConnection = requireNotNull(connection as? HttpURLConnection) {
-                "Unexpected URLConnection type for $url: ${connection::class.java}"
-            }
+            val request = Request.Builder()
+                .url("${apiRecipeId}/$categoryId/recipes")
+                .get()
+                .build()
 
-            urlConnection.requestMethod = "GET"
-            urlConnection.connectTimeout = 10000
-            urlConnection.readTimeout = 15000
+            client.newCall(request).execute().use { response ->
 
-            if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
-                // inputStream.bufferedReader().use { ... } гарантирует закрытие ридера В ЛЮБОМ СЛУЧАЕ
-                // даже если внутри блока произойдет исключение (OutOfMemoryError, SerializationException и т.д.)
-                val responseText = urlConnection.inputStream.bufferedReader().use { reader ->
-                    reader.readText()
+                if (!response.isSuccessful) {
+                    //showError("Проверьте интернет-соединение")
+                    Log.e(TAG, "HTTP Error for Category $categoryId: ${response.code}")
+                    throw HttpException(
+                        response.code,
+                        "HTTP Error for Category $categoryId:: ${response.code}"
+                    )
                 }
-                Log.d(TAG, "Тело responseText: $responseText.")
-                // Десериализация JSON -> Kotlin Objects
-                val recipes = json.decodeFromString<List<RecipeDto>>(responseText)
+
+                val jsonString = response.body?.string()
+                    ?: throw IOException("Body is null for recipe $categoryId")
+
+                Log.d(TAG, "Тело responseText Recipes ($categoryId): $jsonString.")
+
+                val recipes =
+                    json.decodeFromString<List<RecipeDto>>(jsonString)
+
                 Log.d(TAG, "Категория $categoryId: получено ${recipes.size} рецептов")
-
-            } else {
-                throw Exception("HTTP Error: ${urlConnection.responseCode}. Message: ${urlConnection.responseMessage}")
+                if (recipes.isEmpty()) {
+                    Log.w(TAG, "Категория $categoryId вернулась пустой")
+                }
             }
-
         } catch (e: Exception) {
             Log.e(TAG, "Ошибка для категории $categoryId", e)
-        } finally {
-            // Соединение нужно закрывать всегда, независимо от успеха или ошибки выше
-            urlConnection?.disconnect()
         }
     }
 
-    /**
-     * Функция выполнения HTTP-запроса.
-     * Возвращает список объектов DTO.
-     */
     private fun fetchCategories(urlString: String): List<CategoryDto> {
-        var urlConnection: HttpURLConnection? = null
+        val request = Request.Builder()
+            .url(urlString)
+            .get()
+            .build()
 
-        return try {
-            val url = URL(urlString)
-            val connection = url.openConnection()
-            urlConnection = requireNotNull(connection as? HttpURLConnection) {
-                "Unexpected URLConnection type for $url: ${connection::class.java}"
+        client.newCall(request).execute().use { response ->
+
+            if (!response.isSuccessful) {
+                //showError("Сервер временно недоступен, попробуйте позже")
+                throw HttpException(response.code, "HTTP Error: ${response.code}")
             }
 
-            urlConnection.requestMethod = "GET"
-            urlConnection.connectTimeout = 10000
-            urlConnection.readTimeout = 15000
+            // Безопасное чтение тела. use{} закроет поток автоматически.
+            val jsonString =
+                response.body?.string() ?: throw IOException("Response body is null")
 
-            if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
-                // inputStream.bufferedReader().use { ... } гарантирует закрытие ридера В ЛЮБОМ СЛУЧАЕ
-                // даже если внутри блока произойдет исключение (OutOfMemoryError, SerializationException и т.д.)
-                val responseText = urlConnection.inputStream.bufferedReader().use { reader ->
-                    reader.readText()
-                }
-                Log.d(TAG, "Тело responseText: $responseText.")
-                // Десериализация JSON -> Kotlin Objects
-                json.decodeFromString<List<CategoryDto>>(responseText)
+            Log.d(TAG, "Тело responseText Categories: $jsonString.")
 
-            } else {
-                throw Exception("HTTP Error: ${urlConnection.responseCode}. Message: ${urlConnection.responseMessage}")
-            }
-
-        } finally {
-            // Соединение нужно закрывать всегда, независимо от успеха или ошибки выше
-            urlConnection?.disconnect()
+            // Десериализация JSON -> Kotlin Objects
+            return json.decodeFromString<List<CategoryDto>>(jsonString)
         }
+    }
+
+    private fun showError(message: String) {
+        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
     }
 
     override fun onDestroy() {
