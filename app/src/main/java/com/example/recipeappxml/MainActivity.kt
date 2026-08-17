@@ -2,6 +2,7 @@ package com.example.recipeappxml
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,6 +33,28 @@ class MainActivity : AppCompatActivity() {
         .addInterceptor(HttpLoggingInterceptor { Log.d(TAG, "$it") }.apply {
             level = HttpLoggingInterceptor.Level.BODY
         }).build()
+        //FIXME Смотрите, что произойдёт при HTTP-ошибке категорий. Сервер ответил 500, сработала ветка в fetchCategories:
+        //
+        //showError("Сервер временно недоступен, попробуйте позже") // тост №1 throw IOException(...) // летит вверх
+        //Исключение улетает в catch в onCreate, а там:
+        //
+        //showError("Проверьте интернет-соединение") // тост №2
+        //Итог: пользователь увидит два тоста подряд — «Сервер временно недоступен» и «Проверьте интернет-соединение». Причём второй противоречит первому. Вместо ясности — каша.
+        //
+        //Корень проблемы: вы ловите все исключения одним catch и не различаете «сети нет» и «сервер ответил ошибкой». А это разные сценарии с разными текстами.
+        //
+        //Как развести, минимально и честно:
+        //
+        //1. Создайте маленький тип для HTTP-ошибки, чтобы отличать её от сетевой:
+        //
+        //class HttpException(val code: Int, message: String) : Exception(message)
+        //2. В HTTP-ветках кидайте его (и не показывайте тост внутри fetchCategories):
+        //
+        //if (!response.isSuccessful) { throw HttpException(response.code, "HTTP Error: ${response.code}") }
+        //3. В onCreate разведите catch:
+        //
+        //} catch (e: HttpException) { Log.e(TAG, "HTTP-ошибка", e) showError("Сервер временно недоступен, попробуйте позже") } catch (e: Exception) { Log.e(TAG, "Ошибка при выполнении запроса", e) showError("Проверьте интернет-соединение") }
+        //Теперь при 500 — один тост «Сервер недоступен», при отсутствии сети — один тост «Проверьте интернет». Никаких противоречий.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +86,15 @@ class MainActivity : AppCompatActivity() {
 
                 // Здесь можно обновить UI через runOnUiThread или вернуться в Coroutine Dispatcher.Main
                 Log.d(TAG, "Успешно получено данных: ${categories.size} шт.")
+                if (categories.isEmpty()) {
+                    showError("Данные не найдены")
+                    return@execute
+                }
                 getRecipes(categories)
 
             } catch (e: Exception) {
                 Log.e(TAG, "Ошибка при выполнении запроса", e)
+                showError("Проверьте интернет-соединение")
             }
         }
     }
@@ -86,6 +114,8 @@ class MainActivity : AppCompatActivity() {
             client.newCall(request).execute().use { response ->
 
                 if (!response.isSuccessful) {
+                    //showError("Проверьте интернет-соединение")
+                    Log.e(TAG, "HTTP Error for Category $categoryId: ${response.code}")
                     throw IOException("HTTP Error for Category $categoryId: ${response.code}")
                 }
 
@@ -98,6 +128,9 @@ class MainActivity : AppCompatActivity() {
                     json.decodeFromString<List<RecipeDto>>(jsonString)
 
                 Log.d(TAG, "Категория $categoryId: получено ${recipes.size} рецептов")
+                if (recipes.isEmpty()) {
+                    Log.w(TAG, "Категория $categoryId вернулась пустой")
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Ошибка для категории $categoryId", e)
@@ -113,6 +146,7 @@ class MainActivity : AppCompatActivity() {
         client.newCall(request).execute().use { response ->
 
             if (!response.isSuccessful) {
+                showError("Сервер временно недоступен, попробуйте позже")
                 throw IOException("HTTP Error: ${response.code}. Message: ${response.message}")
             }
 
@@ -125,6 +159,10 @@ class MainActivity : AppCompatActivity() {
             // Десериализация JSON -> Kotlin Objects
             return json.decodeFromString<List<CategoryDto>>(jsonString)
         }
+    }
+
+    private fun showError(message: String) {
+        runOnUiThread { Toast.makeText(this, message, Toast.LENGTH_LONG).show() }
     }
 
     override fun onDestroy() {
