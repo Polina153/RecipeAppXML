@@ -11,6 +11,7 @@ import androidx.navigation.findNavController
 import com.example.recipeappxml.databinding.ActivityMainBinding
 import com.example.recipeappxml.model.CategoryDto
 import com.example.recipeappxml.model.RecipeDto
+import com.example.recipeappxml.utils.HttpException
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -33,28 +34,6 @@ class MainActivity : AppCompatActivity() {
         .addInterceptor(HttpLoggingInterceptor { Log.d(TAG, "$it") }.apply {
             level = HttpLoggingInterceptor.Level.BODY
         }).build()
-        //FIXME Смотрите, что произойдёт при HTTP-ошибке категорий. Сервер ответил 500, сработала ветка в fetchCategories:
-        //
-        //showError("Сервер временно недоступен, попробуйте позже") // тост №1 throw IOException(...) // летит вверх
-        //Исключение улетает в catch в onCreate, а там:
-        //
-        //showError("Проверьте интернет-соединение") // тост №2
-        //Итог: пользователь увидит два тоста подряд — «Сервер временно недоступен» и «Проверьте интернет-соединение». Причём второй противоречит первому. Вместо ясности — каша.
-        //
-        //Корень проблемы: вы ловите все исключения одним catch и не различаете «сети нет» и «сервер ответил ошибкой». А это разные сценарии с разными текстами.
-        //
-        //Как развести, минимально и честно:
-        //
-        //1. Создайте маленький тип для HTTP-ошибки, чтобы отличать её от сетевой:
-        //
-        //class HttpException(val code: Int, message: String) : Exception(message)
-        //2. В HTTP-ветках кидайте его (и не показывайте тост внутри fetchCategories):
-        //
-        //if (!response.isSuccessful) { throw HttpException(response.code, "HTTP Error: ${response.code}") }
-        //3. В onCreate разведите catch:
-        //
-        //} catch (e: HttpException) { Log.e(TAG, "HTTP-ошибка", e) showError("Сервер временно недоступен, попробуйте позже") } catch (e: Exception) { Log.e(TAG, "Ошибка при выполнении запроса", e) showError("Проверьте интернет-соединение") }
-        //Теперь при 500 — один тост «Сервер недоступен», при отсутствии сети — один тост «Проверьте интернет». Никаких противоречий.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +71,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 getRecipes(categories)
 
+            } catch (e: HttpException) {
+                Log.e(TAG, "HTTP-ошибка", e)
+                showError("Сервер временно недоступен, попробуйте позже")
             } catch (e: Exception) {
                 Log.e(TAG, "Ошибка при выполнении запроса", e)
                 showError("Проверьте интернет-соединение")
@@ -116,7 +98,10 @@ class MainActivity : AppCompatActivity() {
                 if (!response.isSuccessful) {
                     //showError("Проверьте интернет-соединение")
                     Log.e(TAG, "HTTP Error for Category $categoryId: ${response.code}")
-                    throw IOException("HTTP Error for Category $categoryId: ${response.code}")
+                    throw HttpException(
+                        response.code,
+                        "HTTP Error for Category $categoryId:: ${response.code}"
+                    )
                 }
 
                 val jsonString = response.body?.string()
@@ -146,8 +131,8 @@ class MainActivity : AppCompatActivity() {
         client.newCall(request).execute().use { response ->
 
             if (!response.isSuccessful) {
-                showError("Сервер временно недоступен, попробуйте позже")
-                throw IOException("HTTP Error: ${response.code}. Message: ${response.message}")
+                //showError("Сервер временно недоступен, попробуйте позже")
+                throw HttpException(response.code, "HTTP Error: ${response.code}")
             }
 
             // Безопасное чтение тела. use{} закроет поток автоматически.
