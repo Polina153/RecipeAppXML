@@ -1,15 +1,14 @@
 package com.example.recipeappxml.ui.categories
 
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.recipeappxml.R
 import com.example.recipeappxml.databinding.ItemCategoryBinding
 import com.example.recipeappxml.model.Category
-import java.io.IOException
 
 class CategoriesListAdapter :
     ListAdapter<Category, CategoriesListAdapter.ViewHolder>(CATEGORY_COMPARATOR) {
@@ -46,15 +45,11 @@ class CategoriesListAdapter :
             binding.itemTitle.text = category.title
             binding.itemDescription.text = category.description
 
-            try {
-                itemView.context.assets.open(category.imageUrl).use {
-                    val drawable = Drawable.createFromStream(it, null)
-                    binding.itemImage.setImageDrawable(drawable)
-                }
-            } catch (e: IOException) {
-                Log.e("CategoriesListAdapter", "Ошибка загрузки изображения", e)
-            }
-
+            Glide.with(binding.itemImage)
+                .load(category.imageUrl)
+                .placeholder(R.drawable.img_placeholder)
+                .error(R.drawable.img_error)
+                .into(binding.itemImage)
         }
     }
 

@@ -2,8 +2,6 @@ package com.example.recipeappxml.ui.recipes.recipe
 
 
 import android.app.Application
-import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +16,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val mutableSelectedRecipe = MutableLiveData<RecipeState>()
-
     // Публичное свойство — только для чтения, безопасно для UI
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
 
@@ -28,7 +25,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
-        Log.i("!!!", "ViewModel инициализирована")
         selectRecipe(RecipeState())
     }
 
@@ -54,7 +50,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         val portionsCount: Int = 1,
         val ingredients: List<Ingredient> = emptyList(),
         val method: List<String> = emptyList(),
-        val recipeImage: Drawable? = null,
         val imageUrl: String? = null,
         val error: String? = null
     )
@@ -80,29 +75,9 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                 portionsCount = mutableSelectedRecipe.value?.portionsCount ?: 1,
                 ingredients = recipeFromRepo.ingredients,
                 method = recipeFromRepo.method,
-                recipeImage = loadRecipeImage(recipeFromRepo.imageUrl),
-                imageUrl = recipeFromRepo.imageUrl
+                imageUrl = recipeFromRepo.imageUrl,
             )
             mutableSelectedRecipe.postValue(finalState)
-
-            //Log.e("RecipeViewModel", "Ошибка загрузки рецепта", e)
-        }
-    }
-
-    private fun loadRecipeImage(imageUrl: String?): Drawable? {
-        if (imageUrl == null) return null
-        return try {
-            val inputStream = getApplication<Application>().assets.open(imageUrl)
-            inputStream.use {
-                val drawable = Drawable.createFromStream(it, null)
-                if (drawable == null) {
-                    Log.e("!!!", "Не удалось создать Drawable из $imageUrl")
-                }
-                drawable
-            }
-        } catch (e: Exception) {
-            Log.e("!!!", "Изображение не загрузилось: $e")
-            null
         }
     }
 

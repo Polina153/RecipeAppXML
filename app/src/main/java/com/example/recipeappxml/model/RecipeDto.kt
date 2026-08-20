@@ -17,5 +17,5 @@ fun RecipeDto.toRecipe() =
         title = title,
         ingredients = ingredients.map { it.toIngredient() },
         method = method,
-        imageUrl = imageUrl
+        imageUrl = imageUrl.let { "https://recipes.androidsprint.ru/api/images/$it" }
     )
