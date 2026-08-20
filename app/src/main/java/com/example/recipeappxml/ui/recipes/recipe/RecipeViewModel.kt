@@ -8,8 +8,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.recipeappxml.data.FavoritePrefsManager
-import com.example.recipeappxml.data.RecipesRepositoryStub
+import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
+import com.example.recipeappxml.model.toRecipe
+import java.util.concurrent.Executors
 
 
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
@@ -21,6 +23,9 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
 
     private val prefsManager = FavoritePrefsManager(getApplication())
+
+    private val repository: RecipesRepository = RecipesRepository()
+    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         Log.i("!!!", "ViewModel инициализирована")
@@ -45,12 +50,13 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     data class RecipeState(
         val title: String = "",
-        var isFavorite: Boolean = false,
-        var portionsCount: Int = 1,
+        val isFavorite: Boolean = false,
+        val portionsCount: Int = 1,
         val ingredients: List<Ingredient> = emptyList(),
         val method: List<String> = emptyList(),
         val recipeImage: Drawable? = null,
-        val imageUrl: String? = null
+        val imageUrl: String? = null,
+        val error: String? = null
     )
 
     /**
@@ -58,8 +64,15 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
      * Вызывается один раз при создании фрагмента.
      */
     fun loadRecipe(recipeId: Int) {
-        try {
-            val recipeFromRepo = RecipesRepositoryStub.getRecipeById(recipeId)
+        threadPool.execute {
+            val recipeDto = repository.getRecipeById(recipeId)
+            if (recipeDto == null) {
+                mutableSelectedRecipe.postValue(
+                    RecipeState(error = "Не удалось загрузить рецепт")
+                )
+                return@execute
+            }
+            val recipeFromRepo = recipeDto.toRecipe()
 
             val finalState = RecipeState(
                 title = recipeFromRepo.title,
@@ -70,9 +83,9 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                 recipeImage = loadRecipeImage(recipeFromRepo.imageUrl),
                 imageUrl = recipeFromRepo.imageUrl
             )
-            mutableSelectedRecipe.value = finalState
-        } catch (e: Exception) {
-            Log.e("RecipeViewModel", "Ошибка загрузки рецепта", e)
+            mutableSelectedRecipe.postValue(finalState)
+
+            //Log.e("RecipeViewModel", "Ошибка загрузки рецепта", e)
         }
     }
 
@@ -109,5 +122,10 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             prefsManager.removeFromFavorites(recipeId)
         }
+    }
+
+    override fun onCleared() {
+        threadPool.shutdown()
+        super.onCleared()
     }
 }

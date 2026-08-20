@@ -10,3 +10,12 @@ data class RecipeDto(
     val method: List<String>,
     val imageUrl: String
 )
+
+fun RecipeDto.toRecipe() =
+    Recipe(
+        id = id,
+        title = title,
+        ingredients = ingredients.map { it.toIngredient() },
+        method = method,
+        imageUrl = imageUrl
+    )

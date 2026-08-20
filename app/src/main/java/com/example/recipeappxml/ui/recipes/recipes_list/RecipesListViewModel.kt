@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.recipeappxml.data.RecipesRepositoryStub
+import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
+import com.example.recipeappxml.model.toRecipe
+import java.util.concurrent.Executors
 
 class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModelProvider.Factory {
 
@@ -14,6 +16,9 @@ class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModel
 
     // Публичное свойство — только для чтения, безопасно для UI
     val recipeList: LiveData<RecipeListUiState> get() = _recipeList
+
+    private val repository: RecipesRepository = RecipesRepository()
+    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         loadList()
@@ -29,12 +34,26 @@ class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModel
 
         _recipeList.value = RecipeListUiState(isLoading = true)
 
-        try {
-            val recipeList = RecipesRepositoryStub.getRecipesByCategoryId(categoryId)
+        threadPool.execute {
+            val recipeList = repository.getRecipesByCategoryId(categoryId)
 
-            _recipeList.value = RecipeListUiState(recipes = recipeList, isLoading = false)
-        } catch (e: Exception) {
-            _recipeList.value = RecipeListUiState(error = e, isLoading = false)
+            val state = if (recipeList == null) {
+                RecipeListUiState(
+                    error = IllegalStateException("Не удалось загрузить рецепты"),
+                    isLoading = false
+                )
+            } else {
+                RecipeListUiState(
+                    recipes = recipeList.map { it.toRecipe() },
+                    isLoading = false
+                )
+            }
+            _recipeList.postValue(state)
         }
+    }
+
+    override fun onCleared() {
+        threadPool.shutdown()
+        super.onCleared()
     }
 }

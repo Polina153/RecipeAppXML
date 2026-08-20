@@ -6,14 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.recipeappxml.data.FavoritePrefsManager
-import com.example.recipeappxml.data.RecipesRepositoryStub
+import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
+import com.example.recipeappxml.model.toRecipe
+import java.util.concurrent.Executors
 
 
-class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(), ViewModelProvider.Factory {
+class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
+    ViewModelProvider.Factory {
 
     private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
     val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes
+    private val repository: RecipesRepository = RecipesRepository()
+    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         loadFavorites()
@@ -29,18 +34,30 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(), 
 
         _favoriteRecipes.value = FavoritesUiState(isLoading = true)
 
-        try {
-            val favoriteIds = prefsManager.getAllFavorites()
+        threadPool.execute {
+            val favoriteIds = prefsManager.getAllFavorites().mapNotNull {
+                it.toIntOrNull()
+            }.toSet()
 
-            val recipes = favoriteIds.mapNotNull { idString ->
-                idString.toIntOrNull()?.let { id ->
-                    RecipesRepositoryStub.getRecipeById(id)
-                }
+            val recipes = repository.getRecipesByIds(favoriteIds)
+
+            val state = if (recipes == null) {
+                FavoritesUiState(
+                    error = IllegalStateException("Не удалось загрузить избранное"),
+                    isLoading = false
+                )
+            } else {
+                FavoritesUiState(
+                    recipes = recipes.map { it.toRecipe() },
+                    isLoading = false
+                )
             }
-
-            _favoriteRecipes.value = FavoritesUiState(recipes = recipes, isLoading = false)
-        } catch (e: Exception) {
-            _favoriteRecipes.value = FavoritesUiState(error = e, isLoading = false)
+            _favoriteRecipes.postValue(state)
         }
+    }
+
+    override fun onCleared() {
+        threadPool.shutdown()
+        super.onCleared()
     }
 }
