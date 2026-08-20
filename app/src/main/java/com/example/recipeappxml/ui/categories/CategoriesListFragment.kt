@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -41,6 +42,7 @@ class CategoriesListFragment : Fragment() {
         viewModel.categoryList.observe(viewLifecycleOwner) { state ->
             if (state.error != null) {
                 Log.e("!!!", "Ошибка с загрузкой списка категорий")
+                Toast.makeText(requireContext(), "Ошибка с загрузкой списка категорий", Toast.LENGTH_LONG).show()
             } else {
                 adapter.submitList(state.categories)
                 val isEmpty = state.categories.isEmpty()

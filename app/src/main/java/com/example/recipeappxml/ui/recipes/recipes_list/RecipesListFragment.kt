@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -45,6 +46,7 @@ class RecipesListFragment : Fragment() {
         viewModel.recipeList.observe(viewLifecycleOwner) { state ->
             if (state.error != null) {
                 Log.e("!!!", "Ошибка с загрузкой списка рецептов")
+                Toast.makeText(requireContext(), "Ошибка с загрузкой списка рецептов", Toast.LENGTH_LONG).show()
             } else {
                 adapter.submitList(state.recipes)
                 val isEmpty = state.recipes.isEmpty()
