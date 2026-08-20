@@ -1,15 +1,14 @@
 package com.example.recipeappxml.ui.recipes.recipes_list
 
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.recipeappxml.R
 import com.example.recipeappxml.databinding.ItemRecipeBinding
 import com.example.recipeappxml.model.Recipe
-import java.io.IOException
 
 // Наследуемся от ListAdapter вместо RecyclerView.Adapter
 class RecipesListAdapter : ListAdapter<Recipe, RecipesListAdapter.ViewHolder>(RECIPE_COMPARATOR) {
@@ -69,16 +68,13 @@ class RecipesListAdapter : ListAdapter<Recipe, RecipesListAdapter.ViewHolder>(RE
         fun bind(recipe: Recipe) {
             binding.itemTitle.text = recipe.title
 
-            try {
-                // ВАЖНО: Context берется из itemView, а не из binding.root напрямую (хотя они равны)
-                itemView.context.assets.open(recipe.imageUrl).use { stream ->
-                    val drawable = Drawable.createFromStream(stream, null)
-                    binding.itemImage.setImageDrawable(drawable)
-                }
-            } catch (e: IOException) {
-                Log.e("RecipeListAdapter", "Ошибка загрузки изображения ${recipe.imageUrl}", e)
-                // Опционально: можно поставить заглушку .setImageResource(R.drawable.ic_broken_image)
-            }
+            Glide.with(binding.itemImage)
+                .load(recipe.imageUrl)
+                .placeholder(R.drawable.img_placeholder)
+                .error(R.drawable.img_error)
+                .into(binding.itemImage)
+
+            //Log.e("RecipeListAdapter", "Ошибка загрузки изображения ${recipe.imageUrl}", e)
         }
     }
 }

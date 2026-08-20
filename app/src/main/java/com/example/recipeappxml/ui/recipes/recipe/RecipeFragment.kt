@@ -5,10 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.recipeappxml.R
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -62,9 +64,19 @@ class RecipeFragment : Fragment() {
         })
 
         viewModel.selectedRecipe.observe(viewLifecycleOwner) { state ->
+
+            if (state.error != null) {
+                Toast.makeText(requireContext(), state.error, Toast.LENGTH_LONG).show()
+                return@observe
+            }
             // UI
             binding.recipeName.text = state.title
-            binding.recipeImage.setImageDrawable(state.recipeImage)
+
+            Glide.with(binding.recipeImage)
+                .load(state.imageUrl)
+                .placeholder(R.drawable.img_placeholder)
+                .error(R.drawable.img_error)
+                .into(binding.recipeImage)
 
             updateFavoriteIcon(state.isFavorite)
 

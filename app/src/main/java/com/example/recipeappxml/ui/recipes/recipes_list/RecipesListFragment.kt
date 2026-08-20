@@ -1,6 +1,5 @@
 package com.example.recipeappxml.ui.recipes.recipes_list
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,9 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.example.recipeappxml.R
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
-import java.io.IOException
 
 class RecipesListFragment : Fragment() {
 
@@ -46,7 +46,11 @@ class RecipesListFragment : Fragment() {
         viewModel.recipeList.observe(viewLifecycleOwner) { state ->
             if (state.error != null) {
                 Log.e("!!!", "Ошибка с загрузкой списка рецептов")
-                Toast.makeText(requireContext(), "Ошибка с загрузкой списка рецептов", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Ошибка с загрузкой списка рецептов",
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
                 adapter.submitList(state.recipes)
                 val isEmpty = state.recipes.isEmpty()
@@ -57,14 +61,12 @@ class RecipesListFragment : Fragment() {
 
         binding.recipesHeadingText.text = args.category.title
 
-        try {
-            binding.recipeImage.context.assets.open(args.category.imageUrl).use {
-                val drawable = Drawable.createFromStream(it, null)
-                binding.recipeImage.setImageDrawable(drawable)
-            }
-        } catch (e: IOException) {
-            Log.e("RecipesHeadingImage", "Ошибка загрузки изображения", e)
-        }
+        Glide.with(binding.recipeImage)
+            .load(args.category.imageUrl)
+            .placeholder(R.drawable.img_placeholder)
+            .error(R.drawable.img_error)
+            .into(binding.recipeImage)
+
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {

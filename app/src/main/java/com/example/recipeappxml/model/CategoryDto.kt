@@ -12,4 +12,8 @@ data class CategoryDto(
 }
 
 fun CategoryDto.toCategory() =
-    Category(id = id, title = title, description = description, imageUrl = imageUrl)
+    Category(
+        id = id,
+        title = title,
+        description = description,
+        imageUrl = imageUrl.let { "https://recipes.androidsprint.ru/api/images/$it" })
