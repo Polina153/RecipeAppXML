@@ -8,3 +8,6 @@ data class IngredientDto(
     val unitOfMeasure: String,
     val description: String
 )
+
+fun IngredientDto.toIngredient() =
+    Ingredient(quantity = quantity, unitOfMeasure = unitOfMeasure, description = description)

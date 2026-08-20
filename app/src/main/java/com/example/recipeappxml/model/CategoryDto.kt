@@ -8,4 +8,8 @@ data class CategoryDto(
     val title: String,
     val description: String,
     val imageUrl: String
-)
+) {
+}
+
+fun CategoryDto.toCategory() =
+    Category(id = id, title = title, description = description, imageUrl = imageUrl)
