@@ -4,10 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Category
 import com.example.recipeappxml.model.toCategory
-import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 
 class CategoriesListViewModel : ViewModel(), ViewModelProvider.Factory {
 
@@ -18,7 +19,6 @@ class CategoriesListViewModel : ViewModel(), ViewModelProvider.Factory {
     val categoryList: LiveData<CategoryListUiState> get() = _categoryList
 
     private val repository: RecipesRepository = RecipesRepository()
-    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         loadList()
@@ -36,29 +36,20 @@ class CategoriesListViewModel : ViewModel(), ViewModelProvider.Factory {
     fun loadList() {
         _categoryList.value = CategoryListUiState(isLoading = true)
 
-        threadPool.execute {
+        viewModelScope.launch {
             val result = repository.getCategories()
 
-            if (result == null) {
-                _categoryList.postValue(
-                    CategoryListUiState(
-                        error = IllegalStateException("Ошибка загрузки"),
-                        isLoading = false
-                    )
+            _categoryList.value = if (result == null) {
+                CategoryListUiState(
+                    error = IllegalStateException("Ошибка загрузки"),
+                    isLoading = false
                 )
             } else {
-                _categoryList.postValue(
-                    CategoryListUiState(
-                        categories = result.map { it.toCategory() },
-                        isLoading = false
-                    )
+                CategoryListUiState(
+                    categories = result.map { it.toCategory() },
+                    isLoading = false
                 )
             }
         }
-    }
-
-    override fun onCleared() {
-        threadPool.shutdown()
-        super.onCleared()
     }
 }

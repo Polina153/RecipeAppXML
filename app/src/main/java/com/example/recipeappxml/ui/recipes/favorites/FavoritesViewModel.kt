@@ -5,11 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
 import com.example.recipeappxml.model.toRecipe
-import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 
 
 class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
@@ -18,7 +19,6 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
     private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
     val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes
     private val repository: RecipesRepository = RecipesRepository()
-    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         loadFavorites()
@@ -34,7 +34,7 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
 
         _favoriteRecipes.value = FavoritesUiState(isLoading = true)
 
-        threadPool.execute {
+        viewModelScope.launch {
             val favoriteIds = prefsManager.getAllFavorites().mapNotNull {
                 it.toIntOrNull()
             }.toSet()
@@ -52,12 +52,7 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
                     isLoading = false
                 )
             }
-            _favoriteRecipes.postValue(state)
+            _favoriteRecipes.value = state
         }
-    }
-
-    override fun onCleared() {
-        threadPool.shutdown()
-        super.onCleared()
     }
 }

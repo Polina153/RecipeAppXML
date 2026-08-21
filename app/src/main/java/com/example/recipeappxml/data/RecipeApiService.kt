@@ -2,24 +2,23 @@ package com.example.recipeappxml.data
 
 import com.example.recipeappxml.model.CategoryDto
 import com.example.recipeappxml.model.RecipeDto
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface RecipeApiService {
     @GET("api/category")
-    fun getCategories(): Call<List<CategoryDto>>
+    suspend fun getCategories(): List<CategoryDto>
 
     @GET("api/category/{id}/recipes")
-    fun getRecipesByCategoryId(@Path("id") categoryId: Int): Call<List<RecipeDto>>
+    suspend fun getRecipesByCategoryId(@Path("id") categoryId: Int): List<RecipeDto>
 
     @GET("api/recipe/{id}")
-    fun getRecipeById(@Path("id") recipeId: Int): Call<RecipeDto>
+    suspend fun getRecipeById(@Path("id") recipeId: Int): RecipeDto
 
     @GET("api/category/{id}")
-    fun getCategoryById(@Path("id") categoryId: Int): Call<CategoryDto>
+    suspend fun getCategoryById(@Path("id") categoryId: Int): CategoryDto
 
     @GET("api/recipes")
-    fun getRecipesByIds(@Query("ids") ids: String): Call<List<RecipeDto>>
+    suspend fun getRecipesByIds(@Query("ids") ids: String): List<RecipeDto>
 }
