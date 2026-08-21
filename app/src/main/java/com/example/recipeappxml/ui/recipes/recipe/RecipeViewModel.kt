@@ -5,24 +5,25 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
 import com.example.recipeappxml.model.toRecipe
-import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 
 
 class RecipeViewModel(application: Application) : AndroidViewModel(application) {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val mutableSelectedRecipe = MutableLiveData<RecipeState>()
+
     // Публичное свойство — только для чтения, безопасно для UI
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
 
     private val prefsManager = FavoritePrefsManager(getApplication())
 
     private val repository: RecipesRepository = RecipesRepository()
-    private val threadPool = Executors.newFixedThreadPool(4)
 
     init {
         selectRecipe(RecipeState())
@@ -59,13 +60,11 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
      * Вызывается один раз при создании фрагмента.
      */
     fun loadRecipe(recipeId: Int) {
-        threadPool.execute {
+        viewModelScope.launch {
             val recipeDto = repository.getRecipeById(recipeId)
             if (recipeDto == null) {
-                mutableSelectedRecipe.postValue(
-                    RecipeState(error = "Не удалось загрузить рецепт")
-                )
-                return@execute
+                mutableSelectedRecipe.value = RecipeState(error = "Не удалось загрузить рецепт")
+                return@launch
             }
             val recipeFromRepo = recipeDto.toRecipe()
 
@@ -77,7 +76,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                 method = recipeFromRepo.method,
                 imageUrl = recipeFromRepo.imageUrl,
             )
-            mutableSelectedRecipe.postValue(finalState)
+            mutableSelectedRecipe.value = finalState
         }
     }
 
@@ -97,10 +96,5 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             prefsManager.removeFromFavorites(recipeId)
         }
-    }
-
-    override fun onCleared() {
-        threadPool.shutdown()
-        super.onCleared()
     }
 }
