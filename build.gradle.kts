@@ -5,5 +5,5 @@ plugins {
     id("androidx.navigation.safeargs.kotlin") version "2.9.8" apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
-    id("androidx.room") version "2.8.4" apply false
+  /*  id("androidx.room") version "2.8.4" apply false*/
 }
