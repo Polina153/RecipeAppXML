@@ -9,9 +9,14 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
+import kotlinx.coroutines.launch
 
 class CategoriesListFragment : Fragment() {
 
@@ -19,7 +24,7 @@ class CategoriesListFragment : Fragment() {
     private val binding get() = requireNotNull(_binding)
     private val viewModel: CategoriesListViewModel by viewModels {
         GenericViewModelFactory {
-            CategoriesListViewModel()
+            CategoriesListViewModel(requireContext().applicationContext as ApplicationClass)
         }
     }
     private val adapter by lazy { CategoriesListAdapter() }
@@ -39,15 +44,30 @@ class CategoriesListFragment : Fragment() {
             openRecipesByCategoryId(it)
         }
 
-        viewModel.categoryList.observe(viewLifecycleOwner) { state ->
-            if (state.error != null) {
-                Log.e("!!!", "Ошибка с загрузкой списка категорий")
-                Toast.makeText(requireContext(), "Ошибка с загрузкой списка категорий", Toast.LENGTH_LONG).show()
-            } else {
-                adapter.submitList(state.categories)
-                val isEmpty = state.categories.isEmpty()
-                binding.rvCategories.isVisible = !isEmpty
-                binding.tvEmptyState.isVisible = isEmpty
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.categoryListUiState.collect { state ->
+                        adapter.submitList(state.categories)
+                        val isEmpty = state.categories.isEmpty()
+                        binding.rvCategories.isVisible = !isEmpty && !state.isLoading
+                        binding.tvEmptyState.isVisible = isEmpty && !state.isLoading
+                    }
+                }
+                launch {
+                    viewModel.errorEvent.collect { error ->
+                        if (error != null) {
+                            Log.e("!!!", "Ошибка с загрузкой списка категорий", error)
+                            Toast.makeText(
+                                requireContext(),
+                                "Ошибка: ${error.message ?: "Нет сети"}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            // ВАЖНО: сбрасываем событие, чтобы тост не появился снова после поворота экрана
+                            viewModel.onErrorConsumed()
+                        }
+                    }
+                }
             }
         }
     }

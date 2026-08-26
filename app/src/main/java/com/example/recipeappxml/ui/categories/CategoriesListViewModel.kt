@@ -1,55 +1,73 @@
 package com.example.recipeappxml.ui.categories
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Category
-import com.example.recipeappxml.model.toCategory
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class CategoriesListViewModel : ViewModel(), ViewModelProvider.Factory {
 
-    // Backing property — приватное, изменяемое, внутреннее состояние
-    private val _categoryList = MutableLiveData<CategoryListUiState>()
+class CategoriesListViewModel(application: Application) : AndroidViewModel(application) {
 
-    // Публичное свойство — только для чтения, безопасно для UI
-    val categoryList: LiveData<CategoryListUiState> get() = _categoryList
+    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
-    private val repository: RecipesRepository = RecipesRepository()
+    // --- НОВОЕ: Отдельный поток для событий ошибки ---
+    private val _errorEvent = MutableStateFlow<Throwable?>(null)
+    val errorEvent = _errorEvent.asStateFlow()
+
+    // Основной UI State строится ТОЛЬКО на базе + флаге загрузки
+    private val _isRefreshing = MutableStateFlow(true)
+
+    // Используем StateFlow вместо LiveData. Это "горячий" поток, хранящий последнее состояние.
+    val categoryListUiState: StateFlow<CategoryListUiState> =
+        combine(repository.getCategoriesFromCache(), _isRefreshing) { cachedList, isLoading ->
+            CategoryListUiState(
+                isLoading = isLoading,
+                categories = cachedList,
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CategoryListUiState(isLoading = true)
+        )
 
     init {
-        loadList()
+        triggerRefresh()
     }
 
     data class CategoryListUiState(
         val isLoading: Boolean = false,
         val categories: List<Category> = emptyList(),
-        val error: Throwable? = null
+        // Поле error убрано отсюда, чтобы не мешать объединению потоков
     )
 
-    //error = IllegalStateException("Ошибка загрузки") — технически работает, но класть Throwable в UiState ради строки — тяжеловато.
-    // Проще было бы error: String? и передавать текст.
-    // Но это уже вкус архитектуры, не ошибка — оставляйте как есть, если не хотите менять.
-    fun loadList() {
-        _categoryList.value = CategoryListUiState(isLoading = true)
-
+    fun triggerRefresh() {
         viewModelScope.launch {
-            val result = repository.getCategories()
-
-            _categoryList.value = if (result == null) {
-                CategoryListUiState(
-                    error = IllegalStateException("Ошибка загрузки"),
-                    isLoading = false
-                )
+            _isRefreshing.value = true
+            val isDatabaseEmpty = repository.getCategoriesFromCache().first().isEmpty()
+            val networkResult = repository.fetchCategoriesFromNetwork()
+            if (networkResult != null) {
+                repository.saveCategoriesToDb(networkResult)
             } else {
-                CategoryListUiState(
-                    categories = result.map { it.toCategory() },
-                    isLoading = false
-                )
+                if (isDatabaseEmpty) {
+                    _errorEvent.value = Throwable("Не удалось загрузить категории")
+                }
             }
+            _isRefreshing.value = false
         }
+    }
+
+    // Метод для очистки события ошибки после показа Toast/Snackbar
+    fun onErrorConsumed() {
+        _errorEvent.value = null
     }
 }

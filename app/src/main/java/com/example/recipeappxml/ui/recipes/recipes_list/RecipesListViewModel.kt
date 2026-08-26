@@ -1,16 +1,17 @@
 package com.example.recipeappxml.ui.recipes.recipes_list
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
 import com.example.recipeappxml.model.toRecipe
 import kotlinx.coroutines.launch
 
-class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModelProvider.Factory {
+class RecipesListViewModel(private val categoryId: Int, application: Application): AndroidViewModel(application) {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val _recipeList = MutableLiveData<RecipeListUiState>()
@@ -18,7 +19,7 @@ class RecipesListViewModel(private val categoryId: Int) : ViewModel(), ViewModel
     // Публичное свойство — только для чтения, безопасно для UI
     val recipeList: LiveData<RecipeListUiState> get() = _recipeList
 
-    private val repository: RecipesRepository = RecipesRepository()
+    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
         loadList()

@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
@@ -22,7 +23,8 @@ class FavoritesFragment : Fragment() {
     private val viewModel: FavoritesViewModel by viewModels {
         GenericViewModelFactory {
             FavoritesViewModel(
-                FavoritePrefsManager(requireContext().applicationContext)
+                FavoritePrefsManager(requireContext().applicationContext),
+                requireContext().applicationContext as ApplicationClass
             )
         }
 
@@ -56,7 +58,11 @@ class FavoritesFragment : Fragment() {
         viewModel.favoriteRecipes.observe(viewLifecycleOwner) { state ->
             if (state.error != null) {
                 Log.e("!!!", "Ошибка с загрузкой списка избранных рецептов")
-                Toast.makeText(requireContext(), "Ошибка с загрузкой списка избранных рецептов", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Ошибка с загрузкой списка избранных рецептов",
+                    Toast.LENGTH_LONG
+                ).show()
             } else {
                 adapter.submitList(state.recipes)
                 val isEmpty = state.recipes.isEmpty()

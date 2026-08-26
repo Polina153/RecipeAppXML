@@ -1,11 +1,13 @@
 package com.example.recipeappxml.ui.recipes.favorites
 
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
@@ -13,12 +15,13 @@ import com.example.recipeappxml.model.toRecipe
 import kotlinx.coroutines.launch
 
 
-class FavoritesViewModel(val prefsManager: FavoritePrefsManager) : ViewModel(),
+class FavoritesViewModel(val prefsManager: FavoritePrefsManager, application: Application) :
+    AndroidViewModel(application),
     ViewModelProvider.Factory {
 
     private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
     val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes
-    private val repository: RecipesRepository = RecipesRepository()
+    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
         loadFavorites()

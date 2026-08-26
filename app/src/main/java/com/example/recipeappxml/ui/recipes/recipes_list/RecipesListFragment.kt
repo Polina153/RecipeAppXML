@@ -13,6 +13,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.recipeappxml.R
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
 
@@ -23,7 +24,10 @@ class RecipesListFragment : Fragment() {
     private val args: RecipesListFragmentArgs by navArgs()
     private val viewModel: RecipesListViewModel by viewModels {
         GenericViewModelFactory {
-            RecipesListViewModel(args.category.id)
+            RecipesListViewModel(
+                args.category.id,
+                requireContext().applicationContext as ApplicationClass
+            )
         }
     }
     private val adapter by lazy { RecipesListAdapter() }
