@@ -49,9 +49,8 @@ class CategoriesListFragment : Fragment() {
                 launch {
                     viewModel.categoryListUiState.collect { state ->
                         adapter.submitList(state.categories)
-                        val isEmpty = state.categories.isEmpty()
-                        binding.rvCategories.isVisible = !isEmpty && !state.isLoading
-                        binding.tvEmptyState.isVisible = isEmpty && !state.isLoading
+                        binding.rvCategories.isVisible = state.categories.isNotEmpty()
+                        binding.tvEmptyState.isVisible = state.categories.isEmpty() && !state.isLoading
                     }
                 }
                 launch {

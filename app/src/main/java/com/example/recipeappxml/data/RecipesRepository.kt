@@ -15,10 +15,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RecipesRepository(applicationContext: Context) {
 
-    val database: CategoriesDatabase by lazy {
+    val database: Database by lazy {
         Room.databaseBuilder(
             applicationContext,
-            CategoriesDatabase::class.java,
+            Database::class.java,
             "categories.db"
         ).build()
     }

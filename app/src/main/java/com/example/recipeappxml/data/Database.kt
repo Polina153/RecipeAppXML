@@ -6,6 +6,6 @@ import com.example.recipeappxml.model.CategoriesDao
 import com.example.recipeappxml.model.Category
 
 @Database(entities = [Category::class], version = 1, exportSchema = false)
-abstract class CategoriesDatabase : RoomDatabase() {
+abstract class Database : RoomDatabase() {
     abstract fun categoriesDao(): CategoriesDao
 }
