@@ -1,5 +1,7 @@
 package com.example.recipeappxml.data
 
+import android.content.Context
+import androidx.room.Room
 import com.example.recipeappxml.model.CategoriesDao
 import com.example.recipeappxml.model.Category
 import com.example.recipeappxml.model.CategoryDto
@@ -11,7 +13,17 @@ import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RecipesRepository(val categoriesDao: CategoriesDao) {
+class RecipesRepository(applicationContext: Context) {
+
+    val database: CategoriesDatabase by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            CategoriesDatabase::class.java,
+            "categories.db"
+        ).build()
+    }
+
+    val categoriesDao: CategoriesDao by lazy { database.categoriesDao() }
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://recipes.androidsprint.ru/")
