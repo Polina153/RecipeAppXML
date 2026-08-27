@@ -6,10 +6,11 @@ import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.model.Category
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -20,15 +21,18 @@ class CategoriesListViewModel(application: Application) : AndroidViewModel(appli
     //private val repository: RecipesRepository = repository
 
     // --- НОВОЕ: Отдельный поток для событий ошибки ---
-    private val _errorEvent = MutableStateFlow<Throwable?>(null)
-    val errorEvent = _errorEvent.asStateFlow()
+    private val _errorEvent = MutableSharedFlow<Throwable>()
+    val errorEvent = _errorEvent.asSharedFlow()
 
     // Основной UI State строится ТОЛЬКО на базе + флаге загрузки
     private val _isRefreshing = MutableStateFlow(true)
 
     // Используем StateFlow вместо LiveData. Это "горячий" поток, хранящий последнее состояние.
     val categoryListUiState: StateFlow<CategoryListUiState> =
-        combine((application as ApplicationClass).repository.getCategoriesFromCache(), _isRefreshing) { cachedList, isLoading ->
+        combine(
+            (application as ApplicationClass).repository.getCategoriesFromCache(),
+            _isRefreshing
+        ) { cachedList, isLoading ->
             CategoryListUiState(
                 isLoading = isLoading,
                 categories = cachedList,
@@ -52,21 +56,19 @@ class CategoriesListViewModel(application: Application) : AndroidViewModel(appli
     fun triggerRefresh() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            val isDatabaseEmpty = (application as ApplicationClass).repository.getCategoriesFromCache().first().isEmpty()
-            val networkResult = (application as ApplicationClass).repository.fetchCategoriesFromNetwork()
+            val isDatabaseEmpty =
+                (application as ApplicationClass).repository.getCategoriesFromCache().first()
+                    .isEmpty()
+            val networkResult =
+                (application as ApplicationClass).repository.fetchCategoriesFromNetwork()
             if (networkResult != null) {
                 (application as ApplicationClass).repository.saveCategoriesToDb(networkResult)
             } else {
                 if (isDatabaseEmpty) {
-                    _errorEvent.value = Throwable("Не удалось загрузить категории")
+                    _errorEvent.emit(Throwable("Не удалось загрузить категории"))
                 }
             }
             _isRefreshing.value = false
         }
-    }
-
-    // Метод для очистки события ошибки после показа Toast/Snackbar
-    fun onErrorConsumed() {
-        _errorEvent.value = null
     }
 }

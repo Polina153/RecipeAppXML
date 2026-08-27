@@ -42,7 +42,7 @@ class RecipesRepository(applicationContext: Context) {
 
     // СОХРАНЕНИЕ В БАЗУ: Room сам выполнит insert в IO-потоке благодаря suspend-функции DAO.
     suspend fun saveCategoriesToDb(categories: List<CategoryDto>) {
-        if (categories.isNotEmpty()) {
+        withContext(Dispatchers.IO) {
             categoriesDao.insertCategories(categories.map { it.toCategory() })
         }
     }

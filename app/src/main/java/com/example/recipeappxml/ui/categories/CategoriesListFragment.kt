@@ -50,21 +50,18 @@ class CategoriesListFragment : Fragment() {
                     viewModel.categoryListUiState.collect { state ->
                         adapter.submitList(state.categories)
                         binding.rvCategories.isVisible = state.categories.isNotEmpty()
-                        binding.tvEmptyState.isVisible = state.categories.isEmpty() && !state.isLoading
+                        binding.tvEmptyState.isVisible =
+                            state.categories.isEmpty() && !state.isLoading
                     }
                 }
                 launch {
                     viewModel.errorEvent.collect { error ->
-                        if (error != null) {
-                            Log.e("!!!", "Ошибка с загрузкой списка категорий", error)
-                            Toast.makeText(
-                                requireContext(),
-                                "Ошибка: ${error.message ?: "Нет сети"}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            // ВАЖНО: сбрасываем событие, чтобы тост не появился снова после поворота экрана
-                            viewModel.onErrorConsumed()
-                        }
+                        Log.e("!!!", "Ошибка с загрузкой списка категорий", error)
+                        Toast.makeText(
+                            requireContext(),
+                            "Ошибка: ${error.message ?: "Нет сети"}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
