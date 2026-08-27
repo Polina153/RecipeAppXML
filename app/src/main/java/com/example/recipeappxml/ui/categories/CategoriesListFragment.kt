@@ -66,6 +66,7 @@ class CategoriesListFragment : Fragment() {
                 }
             }
         }
+        viewModel.triggerRefresh()
     }
 
     private fun openRecipesByCategoryId(categoryId: Int) {

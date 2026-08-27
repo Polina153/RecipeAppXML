@@ -43,10 +43,6 @@ class CategoriesListViewModel(application: Application) : AndroidViewModel(appli
             initialValue = CategoryListUiState(isLoading = true)
         )
 
-    init {
-        triggerRefresh()
-    }
-
     data class CategoryListUiState(
         val isLoading: Boolean = false,
         val categories: List<Category> = emptyList(),
