@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
@@ -23,7 +24,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     private val prefsManager = FavoritePrefsManager(getApplication())
 
-    private val repository: RecipesRepository = RecipesRepository()
+    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
         selectRecipe(RecipeState())

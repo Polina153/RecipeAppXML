@@ -1,13 +1,29 @@
 package com.example.recipeappxml.data
 
+import android.content.Context
+import androidx.room.Room
+import com.example.recipeappxml.model.CategoriesDao
+import com.example.recipeappxml.model.Category
 import com.example.recipeappxml.model.CategoryDto
 import com.example.recipeappxml.model.RecipeDto
+import com.example.recipeappxml.model.toCategory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RecipesRepository {
+class RecipesRepository(applicationContext: Context) {
+
+    val database: Database by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            Database::class.java,
+            "categories.db"
+        ).build()
+    }
+
+    val categoriesDao: CategoriesDao by lazy { database.categoriesDao() }
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://recipes.androidsprint.ru/")
@@ -17,8 +33,19 @@ class RecipesRepository {
     private val service: RecipeApiService =
         retrofit.create(RecipeApiService::class.java)
 
-    suspend fun getCategories(): List<CategoryDto>? {
+    fun getCategoriesFromCache(): Flow<List<Category>> = categoriesDao.getAllCategories()
+
+    // СЕТЕВОЙ ЗАПРОС: Только сеть. Возвращаем DTO или null.
+    suspend fun fetchCategoriesFromNetwork(): List<CategoryDto>? {
         return safeCall { service.getCategories() }
+    }
+
+    // СОХРАНЕНИЕ В БАЗУ: Room сам выполнит insert в IO-потоке благодаря suspend-функции DAO.
+    suspend fun saveCategoriesToDb(categories: List<CategoryDto>) {
+        withContext(Dispatchers.IO) {
+            categoriesDao.clearCategories()
+            categoriesDao.insertCategories(categories.map { it.toCategory() })
+        }
     }
 
     suspend fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto>? {
