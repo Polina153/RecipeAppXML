@@ -5,7 +5,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.FavoritePrefsManager
@@ -50,7 +49,7 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager, application: Ap
                 )
             } else {
                 FavoritesUiState(
-                    recipes = recipes.map { it.toRecipe() },
+                    recipes = recipes.map { it.toRecipe(categoryId = null) },
                     isLoading = false
                 )
             }

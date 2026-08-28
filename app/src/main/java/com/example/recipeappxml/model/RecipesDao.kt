@@ -1,0 +1,16 @@
+package com.example.recipeappxml.model
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface RecipesDao {
+    @Query("SELECT * FROM recipes WHERE categoryId = :categoryId")
+    fun getRecipesByCategory(categoryId: Int): Flow<List<Recipe>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecipes(recipes: List<Recipe>)
+}

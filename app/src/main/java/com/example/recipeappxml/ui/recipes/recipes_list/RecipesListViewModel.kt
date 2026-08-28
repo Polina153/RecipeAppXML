@@ -2,22 +2,21 @@ package com.example.recipeappxml.ui.recipes.recipes_list
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
-import com.example.recipeappxml.model.toRecipe
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class RecipesListViewModel(private val categoryId: Int, application: Application): AndroidViewModel(application) {
+class RecipesListViewModel(private val categoryId: Int, application: Application) :
+    AndroidViewModel(application) {
 
-    // Backing property — приватное, изменяемое, внутреннее состояние
-    private val _recipeList = MutableLiveData<RecipeListUiState>()
-
-    // Публичное свойство — только для чтения, безопасно для UI
-    val recipeList: LiveData<RecipeListUiState> get() = _recipeList
+    private val _uiState = MutableStateFlow(RecipeListUiState(isLoading = true))
+    val recipeList: StateFlow<RecipeListUiState> = _uiState.asStateFlow()
 
     private val repository: RecipesRepository = (application as ApplicationClass).repository
 
@@ -32,24 +31,26 @@ class RecipesListViewModel(private val categoryId: Int, application: Application
     )
 
     fun loadList() {
-
-        _recipeList.value = RecipeListUiState(isLoading = true)
-
         viewModelScope.launch {
-            val recipeList = repository.getRecipesByCategoryId(categoryId)
-
-            val state = if (recipeList == null) {
-                RecipeListUiState(
-                    error = IllegalStateException("Не удалось загрузить рецепты"),
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            val cached = repository.getRecipesByCategoryFromCache(categoryId).first()
+            val networkResult = repository.getRecipesByCategoryIdFromNetwork(categoryId)
+            if (networkResult != null) {
+                repository.saveRecipesToDb(networkResult, categoryId)
+                _uiState.value = _uiState.value.copy(
+                    recipes = repository.getRecipesByCategoryFromCache(categoryId).first(),
                     isLoading = false
                 )
             } else {
-                RecipeListUiState(
-                    recipes = recipeList.map { it.toRecipe() },
-                    isLoading = false
-                )
+                if (cached.isEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        error = IllegalStateException("Не удалось загрузить рецепты"),
+                        isLoading = false
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(recipes = cached, isLoading = false)
+                }
             }
-            _recipeList.value = state
         }
     }
 }
