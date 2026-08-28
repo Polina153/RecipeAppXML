@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("org.jetbrains.kotlin.plugin.parcelize")
+    alias(libs.plugins.kotlin.parcelize)
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
