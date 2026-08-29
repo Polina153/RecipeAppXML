@@ -18,8 +18,6 @@ import kotlinx.coroutines.launch
 
 
 class CategoriesListViewModel(application: Application) : AndroidViewModel(application) {
-    //private val repository: RecipesRepository = repository
-
     // --- НОВОЕ: Отдельный поток для событий ошибки ---
     private val _errorEvent = MutableSharedFlow<Throwable>()
     val errorEvent = _errorEvent.asSharedFlow()

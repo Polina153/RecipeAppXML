@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -16,6 +19,7 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.utils.GenericViewModelFactory
+import kotlinx.coroutines.launch
 
 class RecipesListFragment : Fragment() {
 
@@ -47,19 +51,24 @@ class RecipesListFragment : Fragment() {
             openRecipeByRecipeId(recipeId)
         }
 
-        viewModel.recipeList.observe(viewLifecycleOwner) { state ->
-            if (state.error != null) {
-                Log.e("!!!", "Ошибка с загрузкой списка рецептов")
-                Toast.makeText(
-                    requireContext(),
-                    "Ошибка с загрузкой списка рецептов",
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                adapter.submitList(state.recipes)
-                val isEmpty = state.recipes.isEmpty()
-                binding.rvRecipes.isVisible = !isEmpty
-                binding.tvEmptyState.isVisible = isEmpty
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.recipeList.collect { state ->
+                        adapter.submitList(state.recipes)
+                        val isEmpty = state.recipes.isEmpty()
+                        binding.rvRecipes.isVisible = !isEmpty
+                        binding.tvEmptyState.isVisible = isEmpty
+                        if (state.error != null) {
+                            Log.e("!!!", "Ошибка с загрузкой списка рецептов", state.error)
+                            Toast.makeText(
+                                requireContext(),
+                                "Ошибка: ${state.error.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
             }
         }
 

@@ -10,10 +10,10 @@ data class Ingredient(
     val unitOfMeasure: String,
     val description: String
 ) : Parcelable {
-
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
+        // Порядок записи должен строго совпадать с порядком чтения выше
         dest.writeString(quantity)
         dest.writeString(unitOfMeasure)
         dest.writeString(description)
