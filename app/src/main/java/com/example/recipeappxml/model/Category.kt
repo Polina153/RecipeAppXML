@@ -14,4 +14,14 @@ data class Category(
     val title: String,
     val description: String,
     val imageUrl: String
-) : Parcelable
+) : Parcelable {
+
+    override fun describeContents(): Int = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeInt(id)
+        dest.writeString(title)
+        dest.writeString(description)
+        dest.writeString(imageUrl)
+    }
+}
