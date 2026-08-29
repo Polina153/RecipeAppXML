@@ -16,18 +16,4 @@ data class Recipe(
     val ingredients: List<Ingredient>,
     val method: List<String>,
     val imageUrl: String
-) : Parcelable {
-    override fun describeContents(): Int = 0
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
-        categoryId?.let { parcel.writeInt(it) }
-        parcel.writeString(title)
-        // Пишем ингредиенты: превращаем List в JSON-строку
-        val ingredientsJson = Gson().toJson(ingredients)
-        parcel.writeString(ingredientsJson)
-        // Пишем метод: стандартный метод для списка строк
-        parcel.writeStringList(method)
-        parcel.writeString(imageUrl)
-    }
-}
+) : Parcelable
