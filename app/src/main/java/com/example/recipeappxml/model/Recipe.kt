@@ -1,9 +1,13 @@
 package com.example.recipeappxml.model
 
+import android.os.Build
+import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -16,4 +20,20 @@ data class Recipe(
     val method: List<String>,
     val imageUrl: String,
     @ColumnInfo(name = "isFavorite") var isFavorite: Boolean
-) : Parcelable
+) : Parcelable {
+    override fun describeContents(): Int = 0
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        categoryId?.let { parcel.writeInt(it) }
+        parcel.writeString(title)
+        // Пишем ингредиенты: превращаем List в JSON-строку
+        val ingredientsJson = Gson().toJson(ingredients)
+        parcel.writeString(ingredientsJson)
+        // Пишем метод: стандартный метод для списка строк
+        parcel.writeStringList(method)
+        parcel.writeString(imageUrl)
+        parcel.writeBoolean(isFavorite)
+    }
+}
