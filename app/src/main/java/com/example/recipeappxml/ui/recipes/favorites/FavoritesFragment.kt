@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.data.ApplicationClass
-import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
 import com.example.recipeappxml.utils.GenericViewModelFactory
@@ -23,7 +22,6 @@ class FavoritesFragment : Fragment() {
     private val viewModel: FavoritesViewModel by viewModels {
         GenericViewModelFactory {
             FavoritesViewModel(
-                FavoritePrefsManager(requireContext().applicationContext),
                 requireContext().applicationContext as ApplicationClass
             )
         }

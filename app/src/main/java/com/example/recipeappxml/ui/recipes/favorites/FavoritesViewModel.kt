@@ -7,15 +7,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
-import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
-import com.example.recipeappxml.model.toRecipe
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
-class FavoritesViewModel(val prefsManager: FavoritePrefsManager, application: Application) :
-    AndroidViewModel(application){
+class FavoritesViewModel(application: Application) :
+    AndroidViewModel(application) {
 
     private val _favoriteRecipes = MutableLiveData<FavoritesUiState>()
     val favoriteRecipes: LiveData<FavoritesUiState> get() = _favoriteRecipes
@@ -36,23 +35,11 @@ class FavoritesViewModel(val prefsManager: FavoritePrefsManager, application: Ap
         _favoriteRecipes.value = FavoritesUiState(isLoading = true)
 
         viewModelScope.launch {
-            val favoriteIds = prefsManager.getAllFavorites().mapNotNull {
-                it.toIntOrNull()
-            }.toSet()
 
-            val recipes = repository.getRecipesByIds(favoriteIds)
-
-            val state = if (recipes == null) {
-                FavoritesUiState(
-                    error = IllegalStateException("Не удалось загрузить избранное"),
-                    isLoading = false
-                )
-            } else {
-                FavoritesUiState(
-                    recipes = recipes.map { it.toRecipe(categoryId = null) },
-                    isLoading = false
-                )
-            }
+            val state = FavoritesUiState(
+                recipes = repository.getFavoriteRecipes().first(),
+                isLoading = false
+            )
             _favoriteRecipes.value = state
         }
     }
