@@ -32,21 +32,22 @@ class RecipesListViewModel(private val categoryId: Int, application: Application
 
     fun loadList() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             val cached = repository.getRecipesByCategoryFromCache(categoryId).first()
-            _uiState.value = _uiState.value.copy(recipes = cached, isLoading = false)
+            _uiState.value = _uiState.value.copy(recipes = cached, isLoading = false, error = null)
             val networkResult = repository.getRecipesByCategoryIdFromNetwork(categoryId)
             if (networkResult != null) {
                 repository.saveRecipesToDb(networkResult, categoryId)
                 _uiState.value = _uiState.value.copy(
                     recipes = repository.getRecipesByCategoryFromCache(categoryId).first(),
-                    isLoading = false
+                    isLoading = false,
+                    error = null
                 )
             } else {
                 if (cached.isEmpty()) {
                     _uiState.value = _uiState.value.copy(
                         error = IllegalStateException("Не удалось загрузить рецепты"),
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
