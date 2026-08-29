@@ -59,9 +59,11 @@ class RecipesRepository(applicationContext: Context) {
     // СОХРАНЕНИЕ В БАЗУ: Room сам выполнит insert в IO-потоке благодаря suspend-функции DAO.
     suspend fun saveRecipesToDb(recipes: List<RecipeDto>, categoryId: Int) {
         withContext(Dispatchers.IO) {
+            recipesDao.deleteRecipesByCategory(categoryId)
             recipesDao.insertRecipes(recipes.map { it.toRecipe(categoryId) })
         }
     }
+
 
     suspend fun getRecipesByCategoryIdFromNetwork(categoryId: Int): List<RecipeDto>? {
         return safeCall { service.getRecipesByCategoryId(categoryId) }
