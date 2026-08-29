@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 
@@ -21,7 +20,16 @@ class FavoritesViewModel(application: Application) :
     private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
-        loadFavorites()
+        _favoriteRecipes.value = FavoritesUiState(isLoading = true)
+
+        viewModelScope.launch {
+            repository.getFavoriteRecipes().collect { recipes ->
+                _favoriteRecipes.value = FavoritesUiState(
+                    recipes = recipes,
+                    isLoading = false
+                )
+            }
+        }
     }
 
     data class FavoritesUiState(
@@ -29,18 +37,4 @@ class FavoritesViewModel(application: Application) :
         val recipes: List<Recipe> = emptyList(),
         val error: Throwable? = null
     )
-
-    fun loadFavorites() {
-
-        _favoriteRecipes.value = FavoritesUiState(isLoading = true)
-
-        viewModelScope.launch {
-
-            val state = FavoritesUiState(
-                recipes = repository.getFavoriteRecipes().first(),
-                isLoading = false
-            )
-            _favoriteRecipes.value = state
-        }
-    }
 }

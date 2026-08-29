@@ -1,10 +1,9 @@
 package com.example.recipeappxml.model
 
-import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.Gson
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -16,5 +15,5 @@ data class Recipe(
     val ingredients: List<Ingredient>,
     val method: List<String>,
     val imageUrl: String,
-    var isFavorite: Boolean
+    @ColumnInfo(name = "isFavorite") var isFavorite: Boolean
 ) : Parcelable
