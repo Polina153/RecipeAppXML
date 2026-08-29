@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.ApplicationClass
-import com.example.recipeappxml.data.FavoritePrefsManager
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
 import com.example.recipeappxml.model.toRecipe
@@ -21,8 +20,6 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     // Публичное свойство — только для чтения, безопасно для UI
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
-
-    private val prefsManager = FavoritePrefsManager(getApplication())
 
     private val repository: RecipesRepository = (application as ApplicationClass).repository
 
@@ -53,7 +50,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
         val ingredients: List<Ingredient> = emptyList(),
         val method: List<String> = emptyList(),
         val imageUrl: String? = null,
-        val error: String? = null
+        val error: String? = null,
     )
 
     /**
@@ -68,10 +65,11 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
                 return@launch
             }
             val recipeFromRepo = recipeDto.toRecipe()
+            val recipeFromDb = repository.getRecipeFromDbById(recipeId)
 
             val finalState = RecipeState(
                 title = recipeFromRepo.title,
-                isFavorite = prefsManager.isFavorite(recipeId),
+                isFavorite = recipeFromDb?.isFavorite ?: false,
                 portionsCount = mutableSelectedRecipe.value?.portionsCount ?: 1,
                 ingredients = recipeFromRepo.ingredients,
                 method = recipeFromRepo.method,
@@ -83,19 +81,7 @@ class RecipeViewModel(application: Application) : AndroidViewModel(application) 
 
     fun onFavoritesClicked(recipeId: Int) {
         val currentState = mutableSelectedRecipe.value ?: return
-        val newIsFavorite = !currentState.isFavorite
-
-        val newState = currentState.copy(isFavorite = newIsFavorite)
-        mutableSelectedRecipe.value = newState
-
-        saveFavorites(recipeId, newIsFavorite)
-    }
-
-    private fun saveFavorites(recipeId: Int, isFavorite: Boolean) {
-        if (isFavorite) {
-            prefsManager.addToFavorites(recipeId)
-        } else {
-            prefsManager.removeFromFavorites(recipeId)
-        }
+        mutableSelectedRecipe.value = currentState.copy(isFavorite = !currentState.isFavorite)
+        viewModelScope.launch { repository.changeFavorite(recipeId) }
     }
 }

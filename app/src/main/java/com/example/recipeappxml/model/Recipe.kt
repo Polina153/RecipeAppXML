@@ -1,7 +1,10 @@
 package com.example.recipeappxml.model
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.RequiresApi
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
@@ -15,10 +18,12 @@ data class Recipe(
     val title: String,
     val ingredients: List<Ingredient>,
     val method: List<String>,
-    val imageUrl: String
+    val imageUrl: String,
+    @ColumnInfo(name = "isFavorite") var isFavorite: Boolean
 ) : Parcelable {
     override fun describeContents(): Int = 0
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
         categoryId?.let { parcel.writeInt(it) }
@@ -29,5 +34,6 @@ data class Recipe(
         // Пишем метод: стандартный метод для списка строк
         parcel.writeStringList(method)
         parcel.writeString(imageUrl)
+        parcel.writeBoolean(isFavorite)
     }
 }

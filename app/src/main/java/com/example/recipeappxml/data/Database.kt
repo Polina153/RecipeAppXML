@@ -11,7 +11,7 @@ import com.example.recipeappxml.model.ConverterForRoom
 import com.example.recipeappxml.model.Recipe
 import com.example.recipeappxml.model.RecipesDao
 
-@Database(entities = [Category::class, Recipe::class], version = 2, exportSchema = false)
+@Database(entities = [Category::class, Recipe::class], version = 3, exportSchema = false)
 @TypeConverters(ConverterForRoom::class)
 abstract class Database : RoomDatabase() {
     abstract fun categoriesDao(): CategoriesDao
@@ -33,5 +33,14 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             )
             """.trimIndent()
         )
+    }
+}
+
+// Новая миграция 2 -> 3
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Добавляем булево поле. INTEGER + NOT NULL + DEFAULT 0 гарантирует,
+        // что у старых записей будет false (0), а новые записи обязаны иметь значение.
+        db.execSQL("ALTER TABLE recipes ADD COLUMN isFavorite INTEGER NOT NULL DEFAULT 0;")
     }
 }

@@ -11,12 +11,13 @@ data class RecipeDto(
     val imageUrl: String
 )
 
-fun RecipeDto.toRecipe(categoryId: Int? = null) =
+fun RecipeDto.toRecipe(categoryId: Int? = null, favoriteIdsFromCache: Set<Int> = emptySet()) =
     Recipe(
         id = id,
         categoryId = categoryId,
         title = title,
         ingredients = ingredients.map { it.toIngredient() },
         method = method,
-        imageUrl = imageUrl.let { "https://recipes.androidsprint.ru/api/images/$it" }
+        imageUrl = imageUrl.let { "https://recipes.androidsprint.ru/api/images/$it" },
+        isFavorite = favoriteIdsFromCache.contains(id)
     )

@@ -23,7 +23,7 @@ class RecipesRepository(applicationContext: Context) {
             applicationContext,
             Database::class.java,
             "categories.db"
-        ).addMigrations(MIGRATION_1_2)
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
     }
 
@@ -43,6 +43,10 @@ class RecipesRepository(applicationContext: Context) {
     fun getRecipesByCategoryFromCache(categoryId: Int): Flow<List<Recipe>> =
         recipesDao.getRecipesByCategory(categoryId)
 
+    fun getFavoriteRecipes(): Flow<List<Recipe>> = recipesDao.getFavoriteRecipes()
+
+    suspend fun changeFavorite(recipeId: Int) = recipesDao.changeFavoriteRecipe(recipeId)
+
     // СЕТЕВОЙ ЗАПРОС: Только сеть. Возвращаем DTO или null.
     suspend fun fetchCategoriesFromNetwork(): List<CategoryDto>? {
         return safeCall { service.getCategories() }
@@ -59,11 +63,11 @@ class RecipesRepository(applicationContext: Context) {
     // СОХРАНЕНИЕ В БАЗУ: Room сам выполнит insert в IO-потоке благодаря suspend-функции DAO.
     suspend fun saveRecipesToDb(recipes: List<RecipeDto>, categoryId: Int) {
         withContext(Dispatchers.IO) {
+            val favoriteIdsFromCache = recipesDao.getFavoriteRecipeIds().toSet()
             recipesDao.deleteRecipesByCategory(categoryId)
-            recipesDao.insertRecipes(recipes.map { it.toRecipe(categoryId) })
+            recipesDao.insertRecipes(recipes.map { it.toRecipe(categoryId, favoriteIdsFromCache) })
         }
     }
-
 
     suspend fun getRecipesByCategoryIdFromNetwork(categoryId: Int): List<RecipeDto>? {
         return safeCall { service.getRecipesByCategoryId(categoryId) }
@@ -71,6 +75,10 @@ class RecipesRepository(applicationContext: Context) {
 
     suspend fun getRecipeById(recipeId: Int): RecipeDto? {
         return safeCall { service.getRecipeById(recipeId) }
+    }
+
+    suspend fun getRecipeFromDbById(recipeId: Int): Recipe? {
+        return recipesDao.getRecipeById(recipeId)
     }
 
     suspend fun getRecipesByIds(ids: Set<Int>): List<RecipeDto>? {
