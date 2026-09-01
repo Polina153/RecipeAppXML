@@ -19,6 +19,7 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
 import com.example.recipeappxml.di.RecipesListViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import kotlinx.coroutines.launch
 
 class RecipesListFragment : Fragment() {
@@ -30,7 +31,12 @@ class RecipesListFragment : Fragment() {
 
     private val viewModel: RecipesListViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        RecipesListViewModelFactory(args.category.id, appContainer.repository)
+        ViewModelFactoryAdapter(
+            RecipesListViewModelFactory(
+                args.category.id,
+                appContainer.repository
+            )
+        )
     }
 
     override fun onCreateView(

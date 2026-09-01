@@ -15,6 +15,7 @@ import com.example.recipeappxml.R
 import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
 import com.example.recipeappxml.di.RecipeViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 class RecipeFragment : Fragment() {
@@ -27,7 +28,7 @@ class RecipeFragment : Fragment() {
 
     private val viewModel: RecipeViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        RecipeViewModelFactory(appContainer.repository)
+        ViewModelFactoryAdapter(RecipeViewModelFactory(appContainer.repository))
     }
 
     override fun onCreateView(

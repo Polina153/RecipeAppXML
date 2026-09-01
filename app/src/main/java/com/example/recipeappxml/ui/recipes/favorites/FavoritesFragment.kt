@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
 import com.example.recipeappxml.di.FavoritesViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
 
 class FavoritesFragment : Fragment() {
@@ -22,7 +23,7 @@ class FavoritesFragment : Fragment() {
 
     private val viewModel: FavoritesViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        FavoritesViewModelFactory(appContainer.repository)
+        ViewModelFactoryAdapter(FavoritesViewModelFactory(appContainer.repository))
     }
 
     private val adapter by lazy { RecipesListAdapter() }

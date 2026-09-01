@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
 import com.example.recipeappxml.di.CategoriesListViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import kotlinx.coroutines.launch
 
 class CategoriesListFragment : Fragment() {
@@ -25,8 +26,9 @@ class CategoriesListFragment : Fragment() {
 
     private val viewModel: CategoriesListViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        CategoriesListViewModelFactory(appContainer.repository)
+        ViewModelFactoryAdapter(CategoriesListViewModelFactory(appContainer.repository))
     }
+
 
     private val adapter by lazy { CategoriesListAdapter() }
 
