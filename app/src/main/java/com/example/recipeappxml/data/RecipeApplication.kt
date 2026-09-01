@@ -6,10 +6,7 @@ import com.example.recipeappxml.di.AppContainer
 
 class RecipeApplication : Application() {
 
-    lateinit var appContainer: AppContainer
-
-    override fun onCreate() {
-        super.onCreate()
-        appContainer = AppContainer(this)
+    val appContainer: AppContainer by lazy{
+        AppContainer(this)
     }
 }

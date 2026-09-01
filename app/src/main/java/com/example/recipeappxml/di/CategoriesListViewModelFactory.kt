@@ -9,16 +9,12 @@ import com.example.recipeappxml.ui.categories.CategoriesListViewModel
 class CategoriesListViewModelFactory(private val recipesRepository: RecipesRepository) :
     ViewModelProvider.Factory {
 
-    override fun <CategoriesListViewModel : ViewModel> create(
-        modelClass: Class<CategoriesListViewModel>,
-        extras: CreationExtras
-    ): CategoriesListViewModel { // Проверяем тип, чтобы избежать ClassCastException
-        return when {
-            modelClass.isAssignableFrom(CategoriesListViewModel::class.java) -> {
-                @Suppress("UNCHECKED_CAST") CategoriesListViewModel(recipesRepository) as CategoriesListViewModel
-            }
-
-            else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+        return if (modelClass.isAssignableFrom(CategoriesListViewModel::class.java)) {
+            CategoriesListViewModel(recipesRepository) as T
+        } else {
+            throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
 

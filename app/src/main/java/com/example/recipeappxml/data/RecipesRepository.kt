@@ -1,5 +1,6 @@
 package com.example.recipeappxml.data
 
+import android.util.Log
 import com.example.recipeappxml.model.CategoriesDao
 import com.example.recipeappxml.model.Category
 import com.example.recipeappxml.model.CategoryDto
@@ -31,7 +32,7 @@ class RecipesRepository(
 
     // СЕТЕВОЙ ЗАПРОС: Только сеть. Возвращаем DTO или null.
     suspend fun fetchCategoriesFromNetwork(): List<CategoryDto>? {
-        return safeCall { service.getCategories() }
+        return safeNetworkCall { service.getCategories() }
     }
 
     // СОХРАНЕНИЕ В БАЗУ: Room сам выполнит insert в IO-потоке благодаря suspend-функции DAO.
@@ -52,11 +53,11 @@ class RecipesRepository(
     }
 
     suspend fun getRecipesByCategoryIdFromNetwork(categoryId: Int): List<RecipeDto>? {
-        return safeCall { service.getRecipesByCategoryId(categoryId) }
+        return safeNetworkCall { service.getRecipesByCategoryId(categoryId) }
     }
 
     suspend fun getRecipeById(recipeId: Int): RecipeDto? {
-        return safeCall { service.getRecipeById(recipeId) }
+        return safeNetworkCall { service.getRecipeById(recipeId) }
     }
 
     suspend fun getRecipeFromDbById(recipeId: Int): Recipe? {
@@ -64,18 +65,22 @@ class RecipesRepository(
     }
 
     suspend fun getRecipesByIds(ids: Set<Int>): List<RecipeDto>? {
-        return safeCall { service.getRecipesByIds(ids.joinToString(",")) }
+        return safeNetworkCall { service.getRecipesByIds(ids.joinToString(",")) }
     }
-//safeCall глотает все Exception и возвращает null. Работает, но теряется диагностика:
-// вы не узнаете, упал ли сервер, отвалилась ли сеть или пришёл 500.
-// Для этой задачи допустимо, но имейте в виду: в боевом проекте такую обёртку обычно сужают или
-// пробрасывают ошибку наверх.
 
-    private suspend fun <T> safeCall(block: suspend () -> T?): T? = try {
-        withContext(iODispatcher) {
-            block()
+    private suspend fun <T> safeNetworkCall(block: suspend () -> T?): T? {
+        return try {
+            withContext(iODispatcher) { block() }
+        } catch (e: Exception) {
+            // 1. Если корутина была отменена пользователем (ушел со экрана),
+            // мы НЕ должны ловить эту ошибку, иначе отмена сломается.
+            if (e is java.util.concurrent.CancellationException) {
+                throw e
+            }
+            // 2. Для всех остальных ошибок (No Internet, Timeout, HTTP 500) пишем лог.
+            Log.e("!!!", "Ошибка при выполнении сетевого запроса", e)
+            // 3. И возвращаем null, чтобы ViewModel мог показать UI состояния ошибки.
+            null
         }
-    } catch (e: Exception) {
-        null
     }
 }
