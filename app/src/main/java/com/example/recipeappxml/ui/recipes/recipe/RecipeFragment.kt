@@ -12,17 +12,24 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.recipeappxml.R
+import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
+import com.example.recipeappxml.di.RecipeViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 class RecipeFragment : Fragment() {
 
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private val viewModel: RecipeViewModel by viewModels()
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
     private val recipeFragmentArgs: RecipeFragmentArgs by navArgs<RecipeFragmentArgs>()
+
+    private val viewModel: RecipeViewModel by viewModels {
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        ViewModelFactoryAdapter(RecipeViewModelFactory(appContainer.repository))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

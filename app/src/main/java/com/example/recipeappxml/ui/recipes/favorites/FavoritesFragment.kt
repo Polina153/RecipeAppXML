@@ -10,24 +10,24 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.recipeappxml.data.ApplicationClass
+import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
+import com.example.recipeappxml.di.FavoritesViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import com.example.recipeappxml.ui.recipes.recipes_list.RecipesListAdapter
-import com.example.recipeappxml.utils.GenericViewModelFactory
 
 class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private val viewModel: FavoritesViewModel by viewModels {
-        GenericViewModelFactory {
-            FavoritesViewModel(
-                requireContext().applicationContext as ApplicationClass
-            )
-        }
 
+    private val viewModel: FavoritesViewModel by viewModels {
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        ViewModelFactoryAdapter(FavoritesViewModelFactory(appContainer.repository))
     }
+
     private val adapter by lazy { RecipesListAdapter() }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

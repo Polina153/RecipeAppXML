@@ -1,10 +1,8 @@
 package com.example.recipeappxml.ui.categories
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.application
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeappxml.data.ApplicationClass
+import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Category
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
-class CategoriesListViewModel(application: Application) : AndroidViewModel(application) {
+class CategoriesListViewModel(val repository: RecipesRepository) : ViewModel() {
     // --- НОВОЕ: Отдельный поток для событий ошибки ---
     private val _errorEvent = MutableSharedFlow<Throwable>()
     val errorEvent = _errorEvent.asSharedFlow()
@@ -28,7 +26,7 @@ class CategoriesListViewModel(application: Application) : AndroidViewModel(appli
     // Используем StateFlow вместо LiveData. Это "горячий" поток, хранящий последнее состояние.
     val categoryListUiState: StateFlow<CategoryListUiState> =
         combine(
-            (application as ApplicationClass).repository.getCategoriesFromCache(),
+            repository.getCategoriesFromCache(),
             _isRefreshing
         ) { cachedList, isLoading ->
             CategoryListUiState(
@@ -51,12 +49,12 @@ class CategoriesListViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             _isRefreshing.value = true
             val isDatabaseEmpty =
-                (application as ApplicationClass).repository.getCategoriesFromCache().first()
+                repository.getCategoriesFromCache().first()
                     .isEmpty()
             val networkResult =
-                (application as ApplicationClass).repository.fetchCategoriesFromNetwork()
+                repository.fetchCategoriesFromNetwork()
             if (networkResult != null) {
-                (application as ApplicationClass).repository.saveCategoriesToDb(networkResult)
+                repository.saveCategoriesToDb(networkResult)
             } else {
                 if (isDatabaseEmpty) {
                     _errorEvent.emit(Throwable("Не удалось загрузить категории"))

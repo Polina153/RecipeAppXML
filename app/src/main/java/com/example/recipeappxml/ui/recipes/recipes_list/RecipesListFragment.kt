@@ -16,9 +16,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.recipeappxml.R
-import com.example.recipeappxml.data.ApplicationClass
+import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentRecipesListBinding
-import com.example.recipeappxml.utils.GenericViewModelFactory
+import com.example.recipeappxml.di.RecipesListViewModelFactory
+import com.example.recipeappxml.di.ViewModelFactoryAdapter
 import kotlinx.coroutines.launch
 
 class RecipesListFragment : Fragment() {
@@ -26,15 +27,17 @@ class RecipesListFragment : Fragment() {
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
     private val args: RecipesListFragmentArgs by navArgs()
-    private val viewModel: RecipesListViewModel by viewModels {
-        GenericViewModelFactory {
-            RecipesListViewModel(
-                args.category.id,
-                requireContext().applicationContext as ApplicationClass
-            )
-        }
-    }
     private val adapter by lazy { RecipesListAdapter() }
+
+    private val viewModel: RecipesListViewModel by viewModels {
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        ViewModelFactoryAdapter(
+            RecipesListViewModelFactory(
+                args.category.id,
+                appContainer.repository
+            )
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
