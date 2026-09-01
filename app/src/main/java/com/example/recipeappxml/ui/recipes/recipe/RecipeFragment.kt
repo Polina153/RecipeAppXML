@@ -7,22 +7,30 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.recipeappxml.R
+import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentRecipeBinding
+import com.example.recipeappxml.di.RecipeViewModelFactory
 import com.google.android.material.divider.MaterialDividerItemDecoration
 
 class RecipeFragment : Fragment() {
 
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private val viewModel: RecipeViewModel by viewModels()
+    private lateinit var viewModel: RecipeViewModel
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
     private val recipeFragmentArgs: RecipeFragmentArgs by navArgs<RecipeFragmentArgs>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        viewModel =
+            RecipeViewModelFactory(recipesRepository = appContainer.repository).create()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

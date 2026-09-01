@@ -8,25 +8,29 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.example.recipeappxml.data.ApplicationClass
+import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
-import com.example.recipeappxml.utils.GenericViewModelFactory
+import com.example.recipeappxml.di.CategoriesListViewModelFactory
 import kotlinx.coroutines.launch
 
 class CategoriesListFragment : Fragment() {
 
     private var _binding: FragmentListCategoriesBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private val viewModel: CategoriesListViewModel by viewModels {
-        GenericViewModelFactory {
-            CategoriesListViewModel(requireContext().applicationContext as ApplicationClass)
-        }
+
+    private lateinit var viewModel: CategoriesListViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        viewModel =
+            CategoriesListViewModelFactory(recipesRepository = appContainer.repository).create()
     }
+
     private val adapter by lazy { CategoriesListAdapter() }
 
     override fun onCreateView(

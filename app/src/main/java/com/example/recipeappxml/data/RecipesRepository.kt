@@ -1,7 +1,5 @@
 package com.example.recipeappxml.data
 
-import android.content.Context
-import androidx.room.Room
 import com.example.recipeappxml.model.CategoriesDao
 import com.example.recipeappxml.model.Category
 import com.example.recipeappxml.model.CategoryDto
@@ -10,33 +8,17 @@ import com.example.recipeappxml.model.RecipeDto
 import com.example.recipeappxml.model.RecipesDao
 import com.example.recipeappxml.model.toCategory
 import com.example.recipeappxml.model.toRecipe
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class RecipesRepository(applicationContext: Context) {
-
-    val database: Database by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            Database::class.java,
-            "categories.db"
-        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-            .build()
-    }
-
-    val categoriesDao: CategoriesDao by lazy { database.categoriesDao() }
-    val recipesDao: RecipesDao by lazy { database.recipesDao() }
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://recipes.androidsprint.ru/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val service: RecipeApiService =
-        retrofit.create(RecipeApiService::class.java)
+class RecipesRepository(
+    val recipesDao: RecipesDao,
+    val categoriesDao: CategoriesDao,
+    val service: RecipeApiService,
+    val iODispatcher: CoroutineDispatcher
+) {
 
     fun getCategoriesFromCache(): Flow<List<Category>> = categoriesDao.getAllCategories()
 
@@ -90,7 +72,7 @@ class RecipesRepository(applicationContext: Context) {
 // пробрасывают ошибку наверх.
 
     private suspend fun <T> safeCall(block: suspend () -> T?): T? = try {
-        withContext(Dispatchers.IO) {
+        withContext(iODispatcher) {
             block()
         }
     } catch (e: Exception) {

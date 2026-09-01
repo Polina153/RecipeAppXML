@@ -1,27 +1,23 @@
 package com.example.recipeappxml.ui.recipes.recipe
 
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
 import com.example.recipeappxml.model.toRecipe
 import kotlinx.coroutines.launch
 
 
-class RecipeViewModel(application: Application) : AndroidViewModel(application) {
+class RecipeViewModel(val repository: RecipesRepository) : ViewModel() {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val mutableSelectedRecipe = MutableLiveData<RecipeState>()
 
     // Публичное свойство — только для чтения, безопасно для UI
     val selectedRecipe: LiveData<RecipeState> get() = mutableSelectedRecipe
-
-    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
         selectRecipe(RecipeState())

@@ -1,9 +1,7 @@
 package com.example.recipeappxml.ui.recipes.recipes_list
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeappxml.data.ApplicationClass
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,13 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class RecipesListViewModel(private val categoryId: Int, application: Application) :
-    AndroidViewModel(application) {
+class RecipesListViewModel(private val categoryId: Int, val repository: RecipesRepository) :
+    ViewModel() {
 
     private val _uiState = MutableStateFlow(RecipeListUiState(isLoading = true))
     val recipeList: StateFlow<RecipeListUiState> = _uiState.asStateFlow()
-
-    private val repository: RecipesRepository = (application as ApplicationClass).repository
 
     init {
         loadList()
