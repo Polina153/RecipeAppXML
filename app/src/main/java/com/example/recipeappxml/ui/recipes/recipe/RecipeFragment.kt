@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -20,16 +21,13 @@ class RecipeFragment : Fragment() {
 
     private var _binding: FragmentRecipeBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private lateinit var viewModel: RecipeViewModel
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var methodAdapter: MethodAdapter? = null
     private val recipeFragmentArgs: RecipeFragmentArgs by navArgs<RecipeFragmentArgs>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel: RecipeViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        viewModel =
-            RecipeViewModelFactory(recipesRepository = appContainer.repository).create()
+        RecipeViewModelFactory(appContainer.repository)
     }
 
     override fun onCreateView(

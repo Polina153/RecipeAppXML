@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,17 +26,11 @@ class RecipesListFragment : Fragment() {
     private var _binding: FragmentRecipesListBinding? = null
     private val binding get() = requireNotNull(_binding)
     private val args: RecipesListFragmentArgs by navArgs()
-    private lateinit var viewModel: RecipesListViewModel
     private val adapter by lazy { RecipesListAdapter() }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel: RecipesListViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        viewModel =
-            RecipesListViewModelFactory(
-                args.category.id,
-                recipesRepository = appContainer.repository
-            ).create()
+        RecipesListViewModelFactory(args.category.id, appContainer.repository)
     }
 
     override fun onCreateView(

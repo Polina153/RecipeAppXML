@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentFavoritesBinding
@@ -18,16 +19,14 @@ class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
     private val binding get() = requireNotNull(_binding)
-    private lateinit var viewModel: FavoritesViewModel
+
+    private val viewModel: FavoritesViewModel by viewModels {
+        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+        FavoritesViewModelFactory(appContainer.repository)
+    }
 
     private val adapter by lazy { RecipesListAdapter() }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        viewModel =
-            FavoritesViewModelFactory(recipesRepository = appContainer.repository).create()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

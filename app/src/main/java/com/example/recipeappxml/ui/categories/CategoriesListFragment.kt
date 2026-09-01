@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,13 +23,9 @@ class CategoriesListFragment : Fragment() {
     private var _binding: FragmentListCategoriesBinding? = null
     private val binding get() = requireNotNull(_binding)
 
-    private lateinit var viewModel: CategoriesListViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private val viewModel: CategoriesListViewModel by viewModels {
         val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        viewModel =
-            CategoriesListViewModelFactory(recipesRepository = appContainer.repository).create()
+        CategoriesListViewModelFactory(appContainer.repository)
     }
 
     private val adapter by lazy { CategoriesListAdapter() }
