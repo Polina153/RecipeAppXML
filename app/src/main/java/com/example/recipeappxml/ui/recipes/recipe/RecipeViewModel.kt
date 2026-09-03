@@ -8,10 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Ingredient
 import com.example.recipeappxml.model.toRecipe
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class RecipeViewModel(val repository: RecipesRepository) : ViewModel() {
+@HiltViewModel
+class RecipeViewModel @Inject constructor(val repository: RecipesRepository) : ViewModel() {
 
     // Backing property — приватное, изменяемое, внутреннее состояние
     private val mutableSelectedRecipe = MutableLiveData<RecipeState>()

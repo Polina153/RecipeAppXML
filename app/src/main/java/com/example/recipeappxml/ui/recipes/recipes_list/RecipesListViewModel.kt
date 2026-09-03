@@ -4,20 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeappxml.data.RecipesRepository
 import com.example.recipeappxml.model.Recipe
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RecipesListViewModel(private val categoryId: Int, val repository: RecipesRepository) :
+@HiltViewModel
+class RecipesListViewModel @Inject constructor(
+    //private val categoryId: Int,
+    val repository: RecipesRepository
+) :
     ViewModel() {
+
+    private var currentCategoryId: Int = -1
 
     private val _uiState = MutableStateFlow(RecipeListUiState(isLoading = true))
     val recipeList: StateFlow<RecipeListUiState> = _uiState.asStateFlow()
 
     init {
         loadList()
+    }
+
+    fun initialize(categoryId: Int) {
+        if (currentCategoryId == categoryId && _uiState.value.recipes.isNotEmpty())
+            currentCategoryId = categoryId
     }
 
     data class RecipeListUiState(
@@ -29,13 +42,13 @@ class RecipesListViewModel(private val categoryId: Int, val repository: RecipesR
     fun loadList() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            val cached = repository.getRecipesByCategoryFromCache(categoryId).first()
+            val cached = repository.getRecipesByCategoryFromCache(currentCategoryId).first()
             _uiState.value = _uiState.value.copy(recipes = cached, isLoading = false, error = null)
-            val networkResult = repository.getRecipesByCategoryIdFromNetwork(categoryId)
+            val networkResult = repository.getRecipesByCategoryIdFromNetwork(currentCategoryId)
             if (networkResult != null) {
-                repository.saveRecipesToDb(networkResult, categoryId)
+                repository.saveRecipesToDb(networkResult, currentCategoryId)
                 _uiState.value = _uiState.value.copy(
-                    recipes = repository.getRecipesByCategoryFromCache(categoryId).first(),
+                    recipes = repository.getRecipesByCategoryFromCache(currentCategoryId).first(),
                     isLoading = false,
                     error = null
                 )

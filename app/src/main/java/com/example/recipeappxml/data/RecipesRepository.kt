@@ -13,13 +13,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class RecipesRepository(
+class RecipesRepository @Inject constructor(
     val recipesDao: RecipesDao,
     val categoriesDao: CategoriesDao,
     val service: RecipeApiService,
-    val iODispatcher: CoroutineDispatcher
+    //val iODispatcher: CoroutineDispatcher
 ) {
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     fun getCategoriesFromCache(): Flow<List<Category>> = categoriesDao.getAllCategories()
 
@@ -70,7 +72,7 @@ class RecipesRepository(
 
     private suspend fun <T> safeNetworkCall(block: suspend () -> T?): T? {
         return try {
-            withContext(iODispatcher) { block() }
+            withContext(ioDispatcher) { block() }
         } catch (e: Exception) {
             // 1. Если корутина была отменена пользователем (ушел со экрана),
             // мы НЕ должны ловить эту ошибку, иначе отмена сломается.
