@@ -25,9 +25,10 @@ class RecipesListViewModel @Inject constructor(
     val recipeList: StateFlow<RecipeListUiState> = _uiState.asStateFlow()
 
     fun initialize(categoryId: Int) {
-        if (currentCategoryId == categoryId && _uiState.value.recipes.isNotEmpty())
-            currentCategoryId = categoryId
 
+        if (categoryId == currentCategoryId && _uiState.value.recipes.isNotEmpty()) return
+
+        currentCategoryId = categoryId
         loadList()
     }
 

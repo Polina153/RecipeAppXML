@@ -41,6 +41,8 @@ class RecipesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.rvRecipes.adapter = adapter
+        viewModel.initialize(args.category.id)
+
         adapter.setOnItemClickListener { recipeId ->
             openRecipeByRecipeId(recipeId)
         }
@@ -74,7 +76,6 @@ class RecipesListFragment : Fragment() {
             .error(R.drawable.img_error)
             .into(binding.recipeImage)
 
-        viewModel.initialize(args.category.id)
     }
 
     private fun openRecipeByRecipeId(recipeId: Int) {
