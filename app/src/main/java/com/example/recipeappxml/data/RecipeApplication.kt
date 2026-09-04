@@ -1,12 +1,12 @@
 package com.example.recipeappxml.data
 
 import android.app.Application
-import com.example.recipeappxml.di.AppContainer
+import dagger.hilt.android.HiltAndroidApp
 
-
-class RecipeApplication : Application() {
+@HiltAndroidApp
+class RecipeApplication : Application()/* {
 
     val appContainer: AppContainer by lazy{
         AppContainer(this)
     }
-}
+}*/

@@ -13,21 +13,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.example.recipeappxml.data.RecipeApplication
 import com.example.recipeappxml.databinding.FragmentListCategoriesBinding
-import com.example.recipeappxml.di.CategoriesListViewModelFactory
-import com.example.recipeappxml.di.ViewModelFactoryAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class CategoriesListFragment : Fragment() {
 
     private var _binding: FragmentListCategoriesBinding? = null
     private val binding get() = requireNotNull(_binding)
 
-    private val viewModel: CategoriesListViewModel by viewModels {
-        val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
-        ViewModelFactoryAdapter(CategoriesListViewModelFactory(appContainer.repository))
-    }
+    private val viewModel: CategoriesListViewModel by viewModels ()
+       // val appContainer = (requireActivity().applicationContext as RecipeApplication).appContainer
+       // ViewModelFactoryAdapter(CategoriesListViewModelFactory(appContainer.repository))
+
 
 
     private val adapter by lazy { CategoriesListAdapter() }

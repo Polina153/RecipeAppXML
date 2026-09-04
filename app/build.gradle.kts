@@ -1,9 +1,12 @@
 plugins {
     alias(libs.plugins.android.application)
+    //id("org.jetbrains.kotlin.android")
     alias(libs.plugins.kotlin.parcelize)
     id("androidx.navigation.safeargs.kotlin")
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    //id("com.google.devtools.ksp") version "2.0.20-1.0.25"
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -57,8 +60,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui)
     implementation(libs.kotlinx.serialization.json)
     implementation(platform(libs.okhttp.bom))
-    implementation (libs.okhttp)
-    implementation (libs.logging.interceptor)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.glide)
@@ -66,9 +69,10 @@ dependencies {
     val room_version = "2.8.4"
 
     implementation("androidx.room:room-runtime:$room_version")
-
-    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-    // See Add the KSP plugin to your project
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:${room_version}")
+
+    implementation("com.google.dagger:hilt-android:2.60.1")
+    //annotationProcessor("com.google.dagger:hilt-compiler:2.60.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.60.1")
 }
