@@ -24,13 +24,11 @@ class RecipesListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RecipeListUiState(isLoading = true))
     val recipeList: StateFlow<RecipeListUiState> = _uiState.asStateFlow()
 
-    init {
-        loadList()
-    }
-
     fun initialize(categoryId: Int) {
         if (currentCategoryId == categoryId && _uiState.value.recipes.isNotEmpty())
             currentCategoryId = categoryId
+
+        loadList()
     }
 
     data class RecipeListUiState(

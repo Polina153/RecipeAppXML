@@ -15,12 +15,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 class RecipeModule {
 
     @Provides
+    @Singleton
     fun provideDatabase(@ApplicationContext context: Context): Database =
         Room.databaseBuilder(
             context,
@@ -36,7 +38,7 @@ class RecipeModule {
     fun provideRecipesDao(database: Database): RecipesDao = database.recipesDao()
 
     @Provides
-    //@Singleton
+    @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl("https://recipes.androidsprint.ru/")
         .addConverterFactory(GsonConverterFactory.create())
